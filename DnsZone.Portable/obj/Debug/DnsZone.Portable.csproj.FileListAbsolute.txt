@@ -1,0 +1,5 @@
+C:\Desarrollo\DnsZone\DnsZone.Portable\obj\Debug\DnsZone.Portable.csprojResolveAssemblyReference.cache
+C:\Desarrollo\DnsZone\DnsZone.Portable\bin\Debug\DnsZone.Portable.dll
+C:\Desarrollo\DnsZone\DnsZone.Portable\bin\Debug\DnsZone.Portable.pdb
+C:\Desarrollo\DnsZone\DnsZone.Portable\obj\Debug\DnsZone.Portable.dll
+C:\Desarrollo\DnsZone\DnsZone.Portable\obj\Debug\DnsZone.Portable.pdb
