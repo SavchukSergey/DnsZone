@@ -4,3 +4,9 @@ C:\Desarrollo\DnsZone\DnsZone.Portable\obj\Release\DnsZone.Portable.csproj.CoreC
 C:\Desarrollo\DnsZone\DnsZone.Portable\obj\Release\DnsZone.Portable.dll
 C:\Desarrollo\DnsZone\DnsZone.Portable\obj\Release\DnsZone.Portable.pdb
 C:\Desarrollo\DnsZone\DnsZone.Portable\obj\Release\DnsZone.Portable.csprojResolveAssemblyReference.cache
+C:\Desarrollo\Herramientas\DnsZone\DnsZone.Portable\bin\Release\DnsZone.Portable.dll
+C:\Desarrollo\Herramientas\DnsZone\DnsZone.Portable\bin\Release\DnsZone.Portable.pdb
+C:\Desarrollo\Herramientas\DnsZone\DnsZone.Portable\obj\Release\DnsZone.Portable.csprojResolveAssemblyReference.cache
+C:\Desarrollo\Herramientas\DnsZone\DnsZone.Portable\obj\Release\DnsZone.Portable.csproj.CoreCompileInputs.cache
+C:\Desarrollo\Herramientas\DnsZone\DnsZone.Portable\obj\Release\DnsZone.Portable.dll
+C:\Desarrollo\Herramientas\DnsZone\DnsZone.Portable\obj\Release\DnsZone.Portable.pdb
