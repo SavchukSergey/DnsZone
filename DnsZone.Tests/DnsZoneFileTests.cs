@@ -1,15 +1,20 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
 using System.Net;
 using DnsZone.IO;
 using DnsZone.Records;
 using DnsZone.Tokens;
 using NUnit.Framework;
+using System.Threading.Tasks;
 
 namespace DnsZone.Tests {
     [TestFixture]
     public class DnsZoneFileTests {
+
+        [Test]
+        public async Task Parse2Test() {
+            var zone = await DnsZoneFile.LoadFromFileAsync(@"Samples/domain.com.zone", "domain.com");
+        }
 
         [Test]
         public void ParseTest() {
@@ -68,6 +73,33 @@ joe IN      TXT (""Located in a black hole""
             Assert.AreEqual("IN", record.Class);
             Assert.AreEqual(ResourceRecordType.TXT, record.Type);
             Assert.AreEqual("Located in a black hole somewhere", record.Content);
+        }
+
+        [Test]
+        public void TxtRecordNoQuotesParseTest()
+        {
+            const string str = @"
+$ORIGIN example.com.
+; multiple quotes strings on a single line
+; generates a single text string of 
+; Located in a black hole somewhere
+$TTL 1h                  ; default expiration time of all resource records without their own TTL value
+joe        IN      TXT    LocatedInABlackHole
+; multiple quoted strings on multiple lines
+joe IN      TXT (""Located in a black hole""
+                    "" somewhere over the rainbow"")
+; generates a single text string of
+; Located in a black hole somewhere over the rainbow";
+            var zone = DnsZoneFile.Parse(str);
+            Assert.AreEqual(2, zone.Records.Count);
+
+            Assert.IsAssignableFrom<TxtResourceRecord>(zone.Records.First());
+
+            var record = (TxtResourceRecord)zone.Records.First();
+            Assert.AreEqual("joe.example.com", record.Name);
+            Assert.AreEqual("IN", record.Class);
+            Assert.AreEqual(ResourceRecordType.TXT, record.Type);
+            Assert.AreEqual("LocatedInABlackHole", record.Content);
         }
 
         [Test]
@@ -265,6 +297,35 @@ _foobar._tcp    SRV 0 1 9 old-slow-box.example.com.
         }
 
         [Test]
+        public void ExplicitOriginTest() {
+            const string str = @"
+; A Records
+@	600	IN	A	184.168.221.14
+sub	600	IN	A	184.168.221.15
+";
+            var zone = DnsZoneFile.Parse(str, "test.com");
+            Assert.AreEqual(2, zone.Records.Count);
+
+            Assert.IsAssignableFrom<AResourceRecord>(zone.Records.First());
+
+            var rootRecord = (AResourceRecord)zone.Records.First();
+            Assert.AreEqual("test.com", rootRecord.Name);
+            var subRecord = (AResourceRecord)zone.Records.Last();
+            Assert.AreEqual("sub.test.com", subRecord.Name);
+        }
+
+        [Test]
+        public void MissingOriginTest() {
+            const string str = @"
+; A Records
+@	600	IN	A	184.168.221.14
+sub	600	IN	A	184.168.221.15
+";
+            Assert.Throws<TokenException>(() => DnsZoneFile.Parse(str));
+        }
+
+
+        [Test]
         public void FormatTest() {
             var zone = new DnsZoneFile();
             zone.Records.Add(new AResourceRecord {
@@ -343,8 +404,6 @@ _foobar._tcp    SRV 0 1 9 old-slow-box.example.com.
 
             var wwwA = zone.Single<AResourceRecord>("www.root.com");
             Assert.AreEqual(IPAddress.Parse("192.168.0.2"), wwwA.Address);
-
-
         }
     }
 }

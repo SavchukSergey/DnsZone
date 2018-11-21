@@ -1,0 +1,50 @@
+﻿$TTL 360 ; 6 minutes
+example.com.   IN  SOA ns1.example.com. admin.example.com. (
+        2016102201 ; serial
+        3600       ; refresh (1 hour)
+        900        ; retry (15 minutes)
+        3600000    ; expire (5 weeks 6 days 16 hours)
+        3600       ; minimum (1 hour)
+        )
+        IN  NS  ns1.example.com.
+        IN  NS  ns2.example.com.
+        IN  MX  10 mx.some-mail-exchanger.com.
+@       IN  A 210.193.229.126
+*       IN  CNAME example.com.
+
+another-txt-verification IN TXT 6bdf97cb517f0739
+@               IN TXT "some-txt-record-verification: 81f6a8cb5cdf2ec7"
+
+example.com. IN  TXT "v=spf1 ip4:210.193.229.1/24 mx a:mail2.example.com a:mail.example.com include:_spf.domain.tld ~all"
+_adsp     IN  TXT "dkim=unknown"
+mail._domainkey IN  TXT "v=DKIM1; k=rsa; t=s; p=MIGfMA0GdsdsCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC9sD+y1XmTzcDAalNVPWYgruALqh+VK3O5tOlOf76eTd1mU9VIplgRfCggTeGzMkciHRwK6AuzKQtVKdjuO5Kfzo0HdM8zCKpVv3kVoHZNScEDTXyc2d7ur9GGqRt1UXrlPSJddRWJYe7wn5rxQUeylt/4yybzhnNet8qYNB4vYQIDAQAB"
+mail._domainkey.mail2 IN TXT "v=DKIM1; g=*; k=rsa; p=MIGfMAdsds0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDJTfSqTh8sHulpMIPT1GHQn04YOEvEh/fKYob6daVQ+//XGrrWuOqMpMeVHhtszk6kvYnNHHHO/Uog9sWML/5lymvc3VmJhyiRxhZb0DQIrjsUPMjfWBL84td/Gmytu+x9uNHHF7JvtY5d6wHx6Z7qBlPWzsvKeRmc0geKpzsXQQIDAQAB"
+
+conf      IN  A 210.193.229.127
+
+video           IN A 210.193.229.23
+feedback    IN  CNAME example.uservoice.com.
+
+files     IN  A 210.193.229.128
+files2      IN  A 210.193.229.129
+
+ftpmp3      IN  A 195.182.155.218
+hp        IN  A 5.9.16.214
+imap      IN  CNAME mail
+lists     IN  CNAME mail
+mail      IN  CNAME domain.mail.domain.net.
+mail2     IN  A 210.193.229.15
+mail2     IN  TXT "v=spf1 ip4:210.193.229.1/24 mx a:mail2.example.com a:mail.example.com include:_spf.domain.tld -all"
+mail2     IN  TXT "some-txt-record-verification: ade18bfb54cdbc7d"
+mail2     IN  MX  10 mail2
+mail2._domainkey  IN  TXT "g=*\; k=rsa\; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCW16VXfI8R7tu+dE+YzfJmODd4BcmXdGT+aAHIKLaUjRg+ashSj82TJR61Zlv/zwHCq7QzrV2vbycaS+xUdZ1XmtlK3rJjZIOw47QLibOulGVvLkIrfyU7sdsdy4YedDeakByP2m+3W7yNEaL3dlST5ilS6X4o4LDaAASHvgTZfyHYnQIDAQAB"
+roundcube   IN  A 210.193.229.15
+mobi      IN  A 210.193.229.125
+mta1      IN  A 210.193.229.9
+mta2      IN  A 210.193.229.11
+mta3      IN  A 210.193.229.10
+mta4      IN  A 210.193.229.12
+ns1       IN  A 210.193.229.6
+ns2       IN  A 2.2.2.2
+ns3       IN  A 210.193.229.20
+ns4       IN  A 210.193.229.21

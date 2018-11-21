@@ -1,0 +1,9 @@
+{
+    "files.exclude": {
+        "**/bin": true,
+        "**/obj": true,
+        "**/*.user": true,
+        "_ReSharper.Caches": true,
+        ".vs": true
+    }
+}

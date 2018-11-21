@@ -61,7 +61,7 @@ namespace DnsZone.Parser {
             while (!context.IsEof) {
                 var token = context.Tokens.Peek();
                 if (token.Type == TokenType.NewLine) break;
-                if (token.Type == TokenType.QuotedString) {
+                if (token.Type == TokenType.QuotedString || token.Type == TokenType.Literal) {
                     sb.Append(token.StringValue);
                     context.Tokens.Dequeue();
                 } else {

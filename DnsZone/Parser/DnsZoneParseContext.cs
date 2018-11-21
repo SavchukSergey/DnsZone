@@ -103,7 +103,7 @@ namespace DnsZone.Parser {
             }
             if (!val.EndsWith(".")) {
                 if (string.IsNullOrWhiteSpace(Origin)) {
-                    throw new Exception("couldn't resolve relative domain name");
+                    throw new ArgumentException("couldn't resolve relative domain name");
                 }
                 val = val + "." + Origin;
             } else {
