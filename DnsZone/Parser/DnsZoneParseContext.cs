@@ -97,13 +97,13 @@ namespace DnsZone.Parser {
         public string ResolveDomainName(string val) {
             if (val == "@") {
                 if (string.IsNullOrWhiteSpace(Origin)) {
-                    throw new ArgumentException("couldn't resolve @ domain");
+                    //throw new ArgumentException("couldn't resolve @ domain");
                 }
                 return Origin;
             }
             if (!val.EndsWith(".")) {
                 if (string.IsNullOrWhiteSpace(Origin)) {
-                    throw new ArgumentException("couldn't resolve relative domain name");
+                    //throw new ArgumentException("couldn't resolve relative domain name");
                 }
                 val = val + "." + Origin;
             } else {
