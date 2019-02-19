@@ -115,7 +115,8 @@ namespace DnsZone.Parser {
         public TimeSpan GetTimeSpan(TimeSpan? explicitValue) {
             if (explicitValue.HasValue) return explicitValue.Value;
             if (DefaultTtl.HasValue) return DefaultTtl.Value;
-            throw new Exception("unknown ttl value");
+			//throw new Exception("unknown ttl value");
+			return TimeSpan.Zero;
         }
 
         public bool TryParseTtl(out TimeSpan val) {
