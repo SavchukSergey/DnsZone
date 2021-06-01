@@ -17,6 +17,8 @@
         HINFO,
         MX,
         TXT,
-        CAA
+        CAA,
+        TLSA,
+        SSHFP
     }
 }

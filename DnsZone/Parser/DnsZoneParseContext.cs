@@ -71,6 +71,13 @@ namespace DnsZone.Parser {
             return token.StringValue;
         }
 
+        public string ReadString()
+        {
+            var token = Tokens.Dequeue();
+            if (token.Type != TokenType.Literal) throw new TokenException("string expected", token);
+            return token.StringValue;
+        }
+
         public string ReadSerialNumber() {
             var token = Tokens.Dequeue();
             if (token.Type != TokenType.Literal) throw new TokenException("serial number expected", token);

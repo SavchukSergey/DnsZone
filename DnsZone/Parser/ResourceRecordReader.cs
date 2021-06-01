@@ -91,5 +91,23 @@ namespace DnsZone.Parser {
             return record;
         }
 
+        public ResourceRecord Visit(TLSAResourceRecord record, DnsZoneParseContext context)
+        {
+            record.CertificateUsage = context.ReadPreference();
+            record.Selector = context.ReadPreference();
+            record.MatchingType = context.ReadPreference();
+            record.CertificateAssociationData = context.ReadString();
+
+            return record;
+        }
+
+        public ResourceRecord Visit(SSHFPResourceRecord record, DnsZoneParseContext context)
+        {
+            record.AlgorithmNumber = context.ReadPreference();
+            record.FingerprintType = context.ReadPreference();
+            record.Fingerprint = context.ReadString();
+
+            return record;
+        }
     }
 }
