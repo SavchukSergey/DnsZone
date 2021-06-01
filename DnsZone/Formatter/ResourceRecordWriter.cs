@@ -31,8 +31,7 @@ namespace DnsZone.Formatter {
             return record;
         }
 
-        public ResourceRecord Visit(TLSAResourceRecord record, DnsZoneFormatterContext context)
-        {
+        public ResourceRecord Visit(TLSAResourceRecord record, DnsZoneFormatterContext context) {
             context.WritePreference(record.CertificateUsage);
             context.WritePreference(record.Selector);
             context.WritePreference(record.MatchingType);
@@ -40,8 +39,7 @@ namespace DnsZone.Formatter {
             return record;
         }
 
-        public ResourceRecord Visit(SSHFPResourceRecord record, DnsZoneFormatterContext context)
-        {
+        public ResourceRecord Visit(SSHFPResourceRecord record, DnsZoneFormatterContext context) {
             context.WritePreference(record.AlgorithmNumber);
             context.WritePreference(record.FingerprintType);
             context.WriteTag(record.Fingerprint);

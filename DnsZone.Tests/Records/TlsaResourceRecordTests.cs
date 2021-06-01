@@ -4,8 +4,7 @@ using NUnit.Framework;
 
 namespace DnsZone.Tests.Records {
     [TestFixture]
-    public class TlsaResourceRecordTests
-    {
+    public class TlsaResourceRecordTests {
 
         [Test]
         public void ParseTest() {
@@ -31,7 +30,7 @@ _443._tcp.keyserver.example.com. IN TLSA 3 1 1 e677073271638e936eb3846c7aacfd3d3
             Assert.AreEqual(1, record.MatchingType);
             Assert.AreEqual("e677073271638e936eb3846c7aacfd3d387b831aa953b7486dc8f6227798f70b", record.CertificateAssociationData);
         }
-        
+
         [Test]
         public void OutputTest() {
             var zone = new DnsZoneFile();
@@ -50,10 +49,8 @@ _443._tcp.keyserver.example.com. IN TLSA 3 1 1 e677073271638e936eb3846c7aacfd3d3
         }
 
         [Test]
-        public void NameTest()
-        {
-            var record = new TLSAResourceRecord
-            {
+        public void NameTest() {
+            var record = new TLSAResourceRecord {
                 Name = "_443._tcp.example.com"
             };
             Assert.AreEqual(443, record.Port);
