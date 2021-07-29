@@ -48,23 +48,39 @@ namespace DnsZone {
 
         public string ToString(string origin) {
             var sb = new StringBuilder();
+            
             var context = new DnsZoneFormatterContext(this, sb) {
                 Origin = origin
             };
+
             if (!string.IsNullOrWhiteSpace(origin)) {
                 context.WriteOrigin(origin);
             }
+
             var writer = new ResourceRecordWriter();
-            foreach (var recordGroup in Records.GroupBy(item => item.Type)) {
+            
+            foreach (var recordGroup in Records.GroupBy(item => item.Type)) 
+            {
                 context.Sb.AppendLine($";{recordGroup.Key} records");
-                foreach (var record in recordGroup) {
-                    context.WriteAndCompressDomainName(record.Name);
+                
+                foreach (var record in recordGroup) 
+                {
+                    if (record.Type != ResourceRecordType.PTR)
+                    {
+                        context.WriteAndCompressDomainName(record.Name);
+                    }
+                    else
+					{
+                        context.WriteDomainName(record.Name);
+                    }
+
                     context.WriteClass(record.Class);
                     context.WriteTimeSpan(record.Ttl);
                     context.WriteResourceRecordType(record.Type);
                     record.AcceptVistor(writer, context);
                     context.Sb.AppendLine();
                 }
+
                 context.Sb.AppendLine();
             }
             return sb.ToString();
