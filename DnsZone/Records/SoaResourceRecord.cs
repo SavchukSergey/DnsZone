@@ -24,7 +24,7 @@ namespace DnsZone.Records {
         }
 
         public override string ToString() {
-            return $"{NameServer} {ResponsibleEmail} {ResponsibleEmail} {SerialNumber} {Refresh.TotalSeconds} {Retry.TotalSeconds} {Expiry.TotalSeconds} {Minimum.TotalSeconds}";
+            return $"{NameServer} {ResponsibleEmail} {SerialNumber} {Refresh.TotalSeconds} {Retry.TotalSeconds} {Expiry.TotalSeconds} {Minimum.TotalSeconds}";
         }
     }
 }
