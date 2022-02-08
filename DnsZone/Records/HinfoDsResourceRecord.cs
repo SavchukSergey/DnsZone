@@ -1,16 +1,18 @@
 ﻿namespace DnsZone.Records {
-    public class NsResourceRecord : ResourceRecord {
+    public class HinfoResourceRecord : ResourceRecord {
 
-        public string NameServer { get; set; }
+        public string Cpu { get; set; }
 
-        public override ResourceRecordType Type => ResourceRecordType.NS;
+        public string Os { get; set; }
+
+        public override ResourceRecordType Type => ResourceRecordType.HINFO;
 
         public override TResult AcceptVistor<TArg, TResult>(IResourceRecordVisitor<TArg, TResult> visitor, TArg arg) {
             return visitor.Visit(this, arg);
         }
 
         public override string ToString() {
-            return NameServer;
+            return $"{Cpu} {Os}";
         }
     }
 }

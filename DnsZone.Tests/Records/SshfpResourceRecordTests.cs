@@ -31,6 +31,7 @@ sil.example.com. IN SSHFP 2 1 450c7d19d5da9a3a5b7c18992d1fbde15d8dad34";
             Assert.AreEqual(2, record.AlgorithmNumber);
             Assert.AreEqual(1, record.FingerprintType);
             Assert.AreEqual("450c7d19d5da9a3a5b7c18992d1fbde15d8dad34", record.Fingerprint);
+            Assert.AreEqual("2 1 450c7d19d5da9a3a5b7c18992d1fbde15d8dad34", record.ToString());
         }
 
         [Test]
@@ -47,8 +48,9 @@ sil.example.com. IN SSHFP 2 1 450c7d19d5da9a3a5b7c18992d1fbde15d8dad34";
                 Fingerprint = @"450c7d19d5da9a3a5b7c19992d1fbde15d8dad34"
             };
             zone.Records.Add(record);
-            string sOutput = zone.ToString();
+            var sOutput = zone.ToString();
             Assert.AreEqual(";SSHFP records\r\nsil.example.com.\tIN\t\tSSHFP\t3\t1\t450c7d19d5da9a3a5b7c19992d1fbde15d8dad34\t\r\n\r\n", sOutput);
+            Assert.AreEqual("3 1 450c7d19d5da9a3a5b7c19992d1fbde15d8dad34", record.ToString());
         }
     }
 }
