@@ -11,5 +11,8 @@ namespace DnsZone.Records {
             return visitor.Visit(this, arg);
         }
 
+        public override string ToString() {
+            return Address.ToString();
+        }
     }
 }

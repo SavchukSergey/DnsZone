@@ -5,9 +5,11 @@
 /DnsZone.Tests/bin/
 /DnsZone.Tests/obj/
 /DnsZone.Tests/DnsZone.Tests.csproj.user
+/DnsZone/*.DotSettings*
 
 /_ReSharper.Caches/
 /.vs/
+/.idea/
 /packages/*
 
 

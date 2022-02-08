@@ -32,6 +32,7 @@ _foobar._tcp    SRV 0 1 9 old-slow-box.example.com.
             Assert.AreEqual(null, record.Class);
             Assert.AreEqual(ResourceRecordType.SRV, record.Type);
             Assert.AreEqual(0, record.Priority);
+            Assert.AreEqual("0 1 9 old-slow-box.example.com", record.ToString());
         }
 
         [Test]
@@ -51,6 +52,7 @@ _foobar._tcp    SRV 0 1 9 old-slow-box.example.com.
 
             record.Host = "vcap.me";
             Assert.AreEqual("_test._udp.vcap.me", record.Name);
+            Assert.AreEqual("0 0 0 vcap.me", record.ToString());
         }
     }
 }
