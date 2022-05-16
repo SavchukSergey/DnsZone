@@ -63,26 +63,29 @@ namespace DnsZone.Formatter {
         }
 
         public void WriteString(string val) {
-
-            val = val
-                .Replace("\\", "\\\\")
-                .Replace("\"", "\\\"");
-
-            if (val.Length > 250)
+            if (val.Length > 200)
             {
                 Sb.Append('(');
 
-                var splitted = val.SplitBy(250);
+                var splitted = val.SplitBy(200);
 
                 foreach (var s in splitted)
-                { 
-                    Sb.AppendLine($"\"{s}\"");
+                {
+                    var part = s
+                        .Replace("\\", "\\\\")
+                        .Replace("\"", "\\\"");
+
+                    Sb.AppendLine($"\"{part}\"");
                 }
 
                 Sb.Append(')');
             }
             else
             {
+                val = val
+                .Replace("\\", "\\\\")
+                .Replace("\"", "\\\"");
+
                 Sb.Append($"\"{val}\"");
             }
 
