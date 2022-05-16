@@ -2,6 +2,7 @@
 using System.Net;
 using System.Text;
 using DnsZone.Records;
+using OKHOSTING.Core;
 
 namespace DnsZone.Formatter {
     public class DnsZoneFormatterContext {
@@ -62,10 +63,29 @@ namespace DnsZone.Formatter {
         }
 
         public void WriteString(string val) {
+
             val = val
                 .Replace("\\", "\\\\")
                 .Replace("\"", "\\\"");
-            Sb.Append($"\"{val}\"");
+
+            if (val.Length > 250)
+            {
+                Sb.Append('(');
+
+                var splitted = val.SplitBy(250);
+
+                foreach (var s in splitted)
+                { 
+                    Sb.AppendLine($"\"{s}\"");
+                }
+
+                Sb.Append(')');
+            }
+            else
+            {
+                Sb.Append($"\"{val}\"");
+            }
+
             Sb.Append(TAB_CHAR);
         }
 
