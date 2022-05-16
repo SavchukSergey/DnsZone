@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Net;
 using System.Text;
 using DnsZone.Records;
@@ -67,15 +68,20 @@ namespace DnsZone.Formatter {
             {
                 Sb.Append('(');
 
-                var splitted = val.SplitBy(200);
+                var splitted = val.SplitBy(200).ToArray();
 
-                foreach (var s in splitted)
+                for (int i = 0; i < splitted.Length; i++)
                 {
-                    var part = s
+                    var part = splitted[i]
                         .Replace("\\", "\\\\")
                         .Replace("\"", "\\\"");
 
-                    Sb.AppendLine($"\"{part}\"");
+                    Sb.Append($"\"{part}\"");
+
+                    if (i < splitted.Length - 1)
+                    {
+                        Sb.AppendLine();
+                    }
                 }
 
                 Sb.Append(')');
