@@ -74,7 +74,11 @@ namespace DnsZone.Tokens {
         private static string ReadCharacterString(ref string content, ref int chIndex) {
             var token = "";
             while (chIndex < content.Length) {
-                var ch = content[chIndex++];
+                var ch = content[chIndex];
+                if (ch == '\r' || ch == '\n') {
+                    return token;
+                }
+                chIndex++;
                 if (char.IsWhiteSpace(ch)) {
                     SkipWhitespace(ref content, ref chIndex);
                     return token;

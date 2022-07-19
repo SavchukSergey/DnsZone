@@ -71,6 +71,13 @@ namespace DnsZone.Parser {
             return token.StringValue;
         }
 
+        public string ReadString()
+        {
+            var token = Tokens.Dequeue();
+            if (token.Type != TokenType.Literal) throw new TokenException("string expected", token);
+            return token.StringValue;
+        }
+
         public string ReadSerialNumber() {
             var token = Tokens.Dequeue();
             if (token.Type != TokenType.Literal) throw new TokenException("serial number expected", token);
@@ -133,8 +140,7 @@ namespace DnsZone.Parser {
         }
 
         public bool TryParseTtl(out TimeSpan? timestamp) {
-            TimeSpan val;
-            if (TryParseTtl(out val)) {
+            if (TryParseTtl(out TimeSpan val)) {
                 timestamp = val;
                 return true;
             }
@@ -153,7 +159,7 @@ namespace DnsZone.Parser {
             return false;
         }
 
-        private void SkipWhiteAndComments() {
+        protected void SkipWhiteAndComments() {
             while (!IsEof) {
                 var token = Tokens.Peek();
                 switch (token.Type) {

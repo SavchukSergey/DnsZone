@@ -12,8 +12,31 @@ namespace DnsZone.Tests {
     public class DnsZoneFileTests {
 
         [Test]
+        public async Task ParseWhitespace() {
+            var zone = await DnsZoneFile.LoadFromFileAsync(@"Samples/whitespace.com.zone", "whitespace.com");
+            Assert.IsNotNull(zone);
+        }
+
+        [Test]
         public async Task Parse2Test() {
             var zone = await DnsZoneFile.LoadFromFileAsync(@"Samples/domain.com.zone", "domain.com");
+            Assert.IsNotNull(zone);
+        }
+
+        [Test]
+        public void EmptyTest() {
+            const string str = @"
+;just single comment
+    ;white space and comments
+
+";
+            try {
+                var zone = DnsZoneFile.Parse(str);
+                Assert.AreEqual(0, zone.Records.Count);
+            } catch (TokenException exc) {
+                Console.WriteLine(exc.Token.Position.GetLine());
+                throw;
+            }
         }
 
         [Test]
@@ -47,59 +70,6 @@ mail3         IN  A     192.0.2.5             ; IPv4 address for mail3.example.c
                 Console.WriteLine(exc.Token.Position.GetLine());
                 throw;
             }
-        }
-
-        [Test]
-        public void TxtRecordParseTest() {
-            const string str = @"
-$ORIGIN example.com.
-; multiple quotes strings on a single line
-; generates a single text string of 
-; Located in a black hole somewhere
-$TTL 1h                  ; default expiration time of all resource records without their own TTL value
-joe        IN      TXT    ""Located in a black hole"" "" somewhere""
-; multiple quoted strings on multiple lines
-joe IN      TXT (""Located in a black hole""
-                    "" somewhere over the rainbow"")
-; generates a single text string of
-; Located in a black hole somewhere over the rainbow";
-            var zone = DnsZoneFile.Parse(str);
-            Assert.AreEqual(2, zone.Records.Count);
-
-            Assert.IsAssignableFrom<TxtResourceRecord>(zone.Records.First());
-
-            var record = (TxtResourceRecord)zone.Records.First();
-            Assert.AreEqual("joe.example.com", record.Name);
-            Assert.AreEqual("IN", record.Class);
-            Assert.AreEqual(ResourceRecordType.TXT, record.Type);
-            Assert.AreEqual("Located in a black hole somewhere", record.Content);
-        }
-
-        [Test]
-        public void TxtRecordNoQuotesParseTest()
-        {
-            const string str = @"
-$ORIGIN example.com.
-; multiple quotes strings on a single line
-; generates a single text string of 
-; Located in a black hole somewhere
-$TTL 1h                  ; default expiration time of all resource records without their own TTL value
-joe        IN      TXT    LocatedInABlackHole
-; multiple quoted strings on multiple lines
-joe IN      TXT (""Located in a black hole""
-                    "" somewhere over the rainbow"")
-; generates a single text string of
-; Located in a black hole somewhere over the rainbow";
-            var zone = DnsZoneFile.Parse(str);
-            Assert.AreEqual(2, zone.Records.Count);
-
-            Assert.IsAssignableFrom<TxtResourceRecord>(zone.Records.First());
-
-            var record = (TxtResourceRecord)zone.Records.First();
-            Assert.AreEqual("joe.example.com", record.Name);
-            Assert.AreEqual("IN", record.Class);
-            Assert.AreEqual(ResourceRecordType.TXT, record.Type);
-            Assert.AreEqual("LocatedInABlackHole", record.Content);
         }
 
         [Test]
@@ -180,53 +150,6 @@ ftp        IN      CNAME  server1";
         }
 
         [Test]
-        public void MxRecordParseTest() {
-            const string str = @"
-; zone fragment example.com
-; mail servers in the same zone
-; will support incoming email with addresses of the format 
-; user@example.com
-$TTL 2d ; zone default = 2 days or 172800 seconds
-$ORIGIN example.com.
-@               IN     MX     10  mail.foo.com.
-@               IN     MX     20  mail2.foo.com.";
-            var zone = DnsZoneFile.Parse(str);
-            Assert.AreEqual(2, zone.Records.Count);
-
-            Assert.IsAssignableFrom<MxResourceRecord>(zone.Records.First());
-
-            var record = (MxResourceRecord)zone.Records.First();
-            Assert.AreEqual("example.com", record.Name);
-            Assert.AreEqual("IN", record.Class);
-            Assert.AreEqual(ResourceRecordType.MX, record.Type);
-            Assert.AreEqual(10, record.Preference);
-            Assert.AreEqual("mail.foo.com", record.Exchange);
-        }
-
-        [Test]
-        public void NsRecordParseTest() {
-            const string str = @"
-; zone fragment example.com
-; mail servers in the same zone
-; will support incoming email with addresses of the format 
-; user@example.com
-$TTL 2d ; zone default = 2 days or 172800 seconds
-$ORIGIN example.com.
-@               IN      NS     ns1.example.net.
-@               IN      NS     ns1.example.org.";
-            var zone = DnsZoneFile.Parse(str);
-            Assert.AreEqual(2, zone.Records.Count);
-
-            Assert.IsAssignableFrom<NsResourceRecord>(zone.Records.First());
-
-            var record = (NsResourceRecord)zone.Records.First();
-            Assert.AreEqual("example.com", record.Name);
-            Assert.AreEqual("IN", record.Class);
-            Assert.AreEqual(ResourceRecordType.NS, record.Type);
-            Assert.AreEqual("ns1.example.net", record.NameServer);
-        }
-
-        [Test]
         public void PtrRecordParseTest() {
             const string str = @"
 $TTL 2d ; 172800 secs
@@ -266,34 +189,6 @@ alice  IN   A  192.168.2.1 ; host name (same IPv4)";
             Assert.AreEqual("IN", record.Class);
             Assert.AreEqual(ResourceRecordType.A, record.Type);
             Assert.AreEqual(IPAddress.Parse("192.168.2.1"), record.Address);
-        }
-
-        [Test]
-        public void SrvRecordParseTest() {
-            const string str = @"
-$ORIGIN example.com.
-$TTL 2d ; 172800 secs
-; foobar - use old-slow-box or new-fast-box if either is
-; available, make three quarters of the logins go to
-; new-fast-box.
-_foobar._tcp    SRV 0 1 9 old-slow-box.example.com.
-                SRV 0 3 9 new-fast-box.example.com.
-; if neither old-slow-box or new-fast-box is up, switch to
-; using the sysdmin's box and the server
-                SRV 1 0 9 sysadmins-box.example.com.
-                SRV 1 0 9 server.example.com.
-*._tcp          SRV  0 0 0 .
-*._udp          SRV  0 0 0 .";
-            var zone = DnsZoneFile.Parse(str);
-            Assert.AreEqual(6, zone.Records.Count);
-
-            Assert.IsAssignableFrom<SrvResourceRecord>(zone.Records.First());
-
-            var record = (SrvResourceRecord)zone.Records.First();
-            Assert.AreEqual("_foobar._tcp.example.com", record.Name);
-            Assert.AreEqual(null, record.Class);
-            Assert.AreEqual(ResourceRecordType.SRV, record.Type);
-            Assert.AreEqual(0, record.Priority);
         }
 
         [Test]

@@ -1,11 +1,19 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks>netstandard1.3;netstandard2.0</TargetFrameworks>
+    <Version>1.2.0</Version>
+    <Authors>Sergey Savchuk</Authors>
+    <Description>DnsZone is a tool for parsing and formating dnz zone files according to RFC1035 and RFC1034.</Description>
+    <RepositoryUrl>https://github.com/SavchukSergey/DnsZone</RepositoryUrl>
+    <PackageTags>DNS, Zone, Bind</PackageTags>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
   </PropertyGroup>
-
   <ItemGroup>
-    <ProjectReference Include="..\..\OKHOSTING.Core\src\Standard\OKHOSTING.Core\OKHOSTING.Core.csproj" />
+    <None Include="..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
-
 </Project>

@@ -24,6 +24,28 @@ namespace DnsZone.Formatter {
             return record;
         }
 
+        public ResourceRecord Visit(CAAResourceRecord record, DnsZoneFormatterContext context) {
+            context.WritePreference(record.Flag);
+            context.WriteTag(record.Tag);
+            context.WriteString(record.Value);
+            return record;
+        }
+
+        public ResourceRecord Visit(TLSAResourceRecord record, DnsZoneFormatterContext context) {
+            context.WritePreference(record.CertificateUsage);
+            context.WritePreference(record.Selector);
+            context.WritePreference(record.MatchingType);
+            context.WriteTag(record.CertificateAssociationData);
+            return record;
+        }
+
+        public ResourceRecord Visit(SSHFPResourceRecord record, DnsZoneFormatterContext context) {
+            context.WritePreference(record.AlgorithmNumber);
+            context.WritePreference(record.FingerprintType);
+            context.WriteTag(record.Fingerprint);
+            return record;
+        }
+
         public ResourceRecord Visit(NsResourceRecord record, DnsZoneFormatterContext context) {
             context.WriteAndCompressDomainName(record.NameServer);
             return record;

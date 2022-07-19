@@ -1,0 +1,23 @@
+﻿;Example file testing leading whitespace on an otherwise blank line.
+	
+			
+$TTL 2h
+@	IN	SOA	ns.host.net.	ns2.host.net.	(
+			2018042701	; serial
+			2h		; refresh
+			15m		; update retry
+			2w		; expiry
+			2h		; minimum
+		)
+		NS	ns.host.net.
+		NS	ns2.host.net.
+		MX	10	mail
+		IN	TXT	"v=spf1 +mx +include:host.net ?all"
+		A	10.0.0.1
+webmail	IN	CNAME	webmail.host.net.
+admin	IN	CNAME	webmail.host.net.
+stats	IN	CNAME	stats.host.net.
+mail	IN	A	10.0.0.1
+*	IN	A	10.0.0.1
+
+

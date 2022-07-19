@@ -4,6 +4,8 @@ DnsZone is a tool for parsing and building dns zone file.
 
 Available at [nuget.org](https://www.nuget.org/packages/DnsZone/)
 
+Donations: ```bitcoin:12aM1SmiG6QmirQK3huSmPRhyPPQQvqkUv```
+
 # Parsing zone file
 
 Parse dns zone from existing string:

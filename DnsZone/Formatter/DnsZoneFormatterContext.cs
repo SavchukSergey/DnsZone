@@ -63,6 +63,12 @@ namespace DnsZone.Formatter {
             Sb.Append(TAB_CHAR);
         }
 
+        public void WriteTag(string val)
+        {
+            Sb.Append(val);
+            Sb.Append(TAB_CHAR);
+        }
+
         public void WriteString(string val) {
             if (val.Length > 200)
             {

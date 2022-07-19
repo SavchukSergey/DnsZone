@@ -19,5 +19,10 @@
 
         TResult Visit(TxtResourceRecord record, TArg arg);
 
+        TResult Visit(CAAResourceRecord record, TArg arg);
+
+        TResult Visit(TLSAResourceRecord record, TArg arg);
+
+        TResult Visit(SSHFPResourceRecord record, TArg arg);
     }
 }

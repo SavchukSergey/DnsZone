@@ -72,5 +72,40 @@ namespace DnsZone.Parser {
             return record;
         }
 
+        public ResourceRecord Visit(CAAResourceRecord record, DnsZoneParseContext context) {
+            record.Flag = context.ReadPreference();
+            record.Tag = context.Tokens.Dequeue().StringValue;
+            var sb = new StringBuilder();
+            while (!context.IsEof) {
+                var token = context.Tokens.Peek();
+                if (token.Type == TokenType.NewLine) break;
+                if (token.Type == TokenType.QuotedString || token.Type == TokenType.Literal) {
+                    sb.Append(token.StringValue);
+                    context.Tokens.Dequeue();
+                } else {
+                    throw new NotSupportedException($"unexpected token {token.Type}");
+                }
+            }
+            record.Value = sb.ToString();
+
+            return record;
+        }
+
+        public ResourceRecord Visit(TLSAResourceRecord record, DnsZoneParseContext context) {
+            record.CertificateUsage = context.ReadPreference();
+            record.Selector = context.ReadPreference();
+            record.MatchingType = context.ReadPreference();
+            record.CertificateAssociationData = context.ReadString();
+
+            return record;
+        }
+
+        public ResourceRecord Visit(SSHFPResourceRecord record, DnsZoneParseContext context) {
+            record.AlgorithmNumber = context.ReadPreference();
+            record.FingerprintType = context.ReadPreference();
+            record.Fingerprint = context.ReadString();
+
+            return record;
+        }
     }
 }
