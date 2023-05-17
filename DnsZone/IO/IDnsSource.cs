@@ -1,9 +1,9 @@
 ﻿namespace DnsZone.IO {
-    public interface IDnsSource {
+	public interface IDnsSource {
 
-        string LoadContent(string fileName);
+		string LoadContent(string fileName);
 
-        string ResolveFile(string fileName, string referrer);
+		string ResolveFile(string fileName, string referrer);
 
-    }
+	}
 }
