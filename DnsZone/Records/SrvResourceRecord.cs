@@ -44,5 +44,8 @@
             return visitor.Visit(this, arg);
         }
 
+        public override string ToString() {
+            return $"{Priority} {Weight} {Port} {Target ?? Host}";
+        }
     }
 }

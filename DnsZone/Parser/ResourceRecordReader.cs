@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Text;
 using DnsZone.Records;
 using DnsZone.Tokens;
@@ -16,14 +17,55 @@ namespace DnsZone.Parser {
             return record;
         }
 
+        public ResourceRecord Visit(AliasResourceRecord record, DnsZoneParseContext context) {
+            record.Content = context.ReadString();
+            return record;
+        }
+
         public ResourceRecord Visit(CNameResourceRecord record, DnsZoneParseContext context) {
-            record.CanonicalName = context.ReadAndResolveDomainName();
+            record.CanonicalName = context.ReadDomainName();
+            return record;
+        }
+
+        public ResourceRecord Visit(DnameResourceRecord record, DnsZoneParseContext context) {
+            record.Content = context.ReadString();
+            return record;
+        }
+
+        public ResourceRecord Visit(DsResourceRecord record, DnsZoneParseContext context) {
+            record.KeyTag = context.ReadSerialNumber();
+            record.Algorithm = context.ReadPreference();
+            record.HashType = context.ReadPreference();
+            record.Hash = context.ReadSerialNumber();
+            return record;
+        }
+
+        public ResourceRecord Visit(HinfoResourceRecord record, DnsZoneParseContext context) {
+            record.Cpu = context.ReadStringValue();
+            record.Os = context.ReadStringValue();
+            return record;
+        }
+
+        public ResourceRecord Visit(LuaResourceRecord record, DnsZoneParseContext context) {
+            record.TargetType = context.ReadString();
+            record.Script = context.ReadStringValue();
             return record;
         }
 
         public ResourceRecord Visit(MxResourceRecord record, DnsZoneParseContext context) {
             record.Preference = context.ReadPreference();
             record.Exchange = context.ReadAndResolveDomainName();
+            return record;
+        }
+
+        public ResourceRecord Visit(NaptrResourceRecord record, DnsZoneParseContext context) {
+            record.Order = context.ReadPreference();
+            record.Preference = context.ReadPreference();
+            record.Flags = context.ReadStringValue();
+            record.Services = context.ReadStringValue();
+            record.Regexp = context.ReadStringValue();
+            record.Replacement = context.ReadAndResolveDomainName();
+
             return record;
         }
 

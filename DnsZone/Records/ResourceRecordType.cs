@@ -19,6 +19,11 @@
         TXT,
         CAA,
         TLSA,
-        SSHFP
+        SSHFP,
+        ALIAS,
+        DNAME,
+        DS,
+        LUA,
+        NAPTR
     }
 }

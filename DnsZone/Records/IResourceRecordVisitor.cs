@@ -5,9 +5,21 @@
 
         TResult Visit(AaaaResourceRecord record, TArg arg);
 
+        TResult Visit(AliasResourceRecord record, TArg arg);
+
         TResult Visit(CNameResourceRecord record, TArg arg);
 
+        TResult Visit(DnameResourceRecord record, TArg arg);
+
+        TResult Visit(DsResourceRecord record, TArg arg);
+
+        TResult Visit(HinfoResourceRecord record, TArg arg);
+
+        TResult Visit(LuaResourceRecord record, TArg arg);
+
         TResult Visit(MxResourceRecord record, TArg arg);
+
+        TResult Visit(NaptrResourceRecord record, TArg arg);
 
         TResult Visit(NsResourceRecord record, TArg arg);
 

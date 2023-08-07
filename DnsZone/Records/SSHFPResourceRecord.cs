@@ -13,5 +13,8 @@
             return visitor.Visit(this, arg);
         }
 
+        public override string ToString() {
+            return $"{AlgorithmNumber} {FingerprintType} {Fingerprint}";
+        }
     }
 }

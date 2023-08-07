@@ -21,12 +21,17 @@ namespace DnsZone {
                 case "WKS": return ResourceRecordType.WKS;
                 case "PTR": return ResourceRecordType.PTR;
                 case "SRV": return ResourceRecordType.SRV;
+                case "SSHFP": return ResourceRecordType.SSHFP;
                 case "HINFO": return ResourceRecordType.HINFO;
                 case "MX": return ResourceRecordType.MX;
                 case "TXT": return ResourceRecordType.TXT;
                 case "CAA": return ResourceRecordType.CAA;
                 case "TLSA": return ResourceRecordType.TLSA;
-                case "SSHFP": return ResourceRecordType.SSHFP;
+                case "ALIAS": return ResourceRecordType.ALIAS;
+                case "DNAME": return ResourceRecordType.DNAME;
+                case "DS": return ResourceRecordType.DS;
+                case "LUA": return ResourceRecordType.LUA;
+                case "NAPTR": return ResourceRecordType.NAPTR;
                 default:
                     throw new NotSupportedException($"unsupported resource record type {val}");
             }
@@ -54,6 +59,11 @@ namespace DnsZone {
                 case ResourceRecordType.CAA: return "CAA";
                 case ResourceRecordType.TLSA: return "TLSA";
                 case ResourceRecordType.SSHFP: return "SSHFP";
+                case ResourceRecordType.ALIAS: return "ALIAS";
+                case ResourceRecordType.DNAME: return "DNAME";
+                case ResourceRecordType.DS: return "DS";
+                case ResourceRecordType.LUA: return "LUA";
+                case ResourceRecordType.NAPTR: return "NAPTR";
                 default:
                     throw new NotSupportedException($"unsupported resource record type {val}");
             }
@@ -76,12 +86,17 @@ namespace DnsZone {
                 //case ResourceRecordType.WKS: return ResourceRecordType.WKS;
                 case ResourceRecordType.PTR: return new PtrResourceRecord();
                 case ResourceRecordType.SRV: return new SrvResourceRecord();
-                //case ResourceRecordType.HINFO: return ResourceRecordType.HINFO;
+                case ResourceRecordType.HINFO: return new HinfoResourceRecord();
                 case ResourceRecordType.MX: return new MxResourceRecord();
                 case ResourceRecordType.TXT: return new TxtResourceRecord();
                 case ResourceRecordType.CAA: return new CAAResourceRecord();
                 case ResourceRecordType.TLSA: return new TLSAResourceRecord();
                 case ResourceRecordType.SSHFP: return new SSHFPResourceRecord();
+                case ResourceRecordType.ALIAS: return new AliasResourceRecord();
+                case ResourceRecordType.DNAME: return new DnameResourceRecord();
+                case ResourceRecordType.DS: return new DsResourceRecord();
+                case ResourceRecordType.LUA: return new LuaResourceRecord();
+                case ResourceRecordType.NAPTR: return new NaptrResourceRecord();
                 default:
                     throw new NotSupportedException($"unsupported resource record type {type}");
             }

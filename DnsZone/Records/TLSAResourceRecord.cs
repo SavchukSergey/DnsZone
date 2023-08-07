@@ -42,5 +42,8 @@
             return visitor.Visit(this, arg);
         }
 
+        public override string ToString() {
+            return $"{CertificateUsage} {Selector} {MatchingType} {CertificateAssociationData}";
+        }
     }
 }

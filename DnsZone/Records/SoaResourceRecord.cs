@@ -23,5 +23,8 @@ namespace DnsZone.Records {
             return visitor.Visit(this, arg);
         }
 
+        public override string ToString() {
+            return $"{NameServer} {ResponsibleEmail} {ResponsibleEmail} {SerialNumber} {Refresh.TotalSeconds} {Retry.TotalSeconds} {Expiry.TotalSeconds} {Minimum.TotalSeconds}";
+        }
     }
 }

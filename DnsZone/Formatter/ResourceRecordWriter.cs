@@ -13,14 +13,54 @@ namespace DnsZone.Formatter {
             return record;
         }
 
+        public ResourceRecord Visit(AliasResourceRecord record, DnsZoneFormatterContext context) {
+            context.WriteClass(record.Content);
+            return record;
+        }
+
         public ResourceRecord Visit(CNameResourceRecord record, DnsZoneFormatterContext context) {
-            context.WriteAndCompressDomainName(record.CanonicalName);
+            context.WriteDomainName(record.CanonicalName);
+            return record;
+        }
+
+        public ResourceRecord Visit(DnameResourceRecord record, DnsZoneFormatterContext context) {
+            context.WriteTag(record.Content);
+            return record;
+        }
+
+        public ResourceRecord Visit(DsResourceRecord record, DnsZoneFormatterContext context) {
+            context.WriteTag(record.KeyTag);
+            context.WritePreference(record.Algorithm);
+            context.WritePreference(record.HashType);
+            context.WriteTag(record.Hash);
+            return record;
+        }
+
+        public ResourceRecord Visit(HinfoResourceRecord record, DnsZoneFormatterContext context) {
+            context.WriteString(record.Cpu);
+            context.WriteString(record.Os);
+            return record;
+        }
+
+        public ResourceRecord Visit(LuaResourceRecord record, DnsZoneFormatterContext context) {
+            context.WriteTag(record.TargetType);
+            context.WriteString(record.Script);
             return record;
         }
 
         public ResourceRecord Visit(MxResourceRecord record, DnsZoneFormatterContext context) {
             context.WritePreference(record.Preference);
             context.WriteAndCompressDomainName(record.Exchange);
+            return record;
+        }
+
+        public ResourceRecord Visit(NaptrResourceRecord record, DnsZoneFormatterContext context) {
+            context.WritePreference(record.Order);
+            context.WritePreference(record.Preference);
+            context.WriteString(record.Flags);
+            context.WriteString(record.Services);
+            context.WriteString(record.Regexp);
+            context.WriteDomainName(record.Replacement);
             return record;
         }
 

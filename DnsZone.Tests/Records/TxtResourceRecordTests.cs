@@ -30,6 +30,7 @@ joe IN      TXT (""Located in a black hole""
             Assert.AreEqual("IN", record.Class);
             Assert.AreEqual(ResourceRecordType.TXT, record.Type);
             Assert.AreEqual("Located in a black hole somewhere", record.Content);
+            Assert.AreEqual("\"Located in a black hole somewhere\"", record.ToString());
         }
 
         [Test]
@@ -56,6 +57,7 @@ joe IN      TXT (""Located in a black hole""
             Assert.AreEqual("IN", record.Class);
             Assert.AreEqual(ResourceRecordType.TXT, record.Type);
             Assert.AreEqual("LocatedInABlackHole", record.Content);
+            Assert.AreEqual("\"LocatedInABlackHole\"", record.ToString());
         }
 
     }

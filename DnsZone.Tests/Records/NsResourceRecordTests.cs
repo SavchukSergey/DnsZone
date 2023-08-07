@@ -28,6 +28,7 @@ $ORIGIN example.com.
             Assert.AreEqual("IN", record.Class);
             Assert.AreEqual(ResourceRecordType.NS, record.Type);
             Assert.AreEqual("ns1.example.net", record.NameServer);
+            Assert.AreEqual("ns1.example.net", record.ToString());
         }
 
     }

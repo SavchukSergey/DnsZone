@@ -28,6 +28,7 @@ $ORIGIN example.com.
             Assert.AreEqual(ResourceRecordType.MX, record.Type);
             Assert.AreEqual(10, record.Preference);
             Assert.AreEqual("mail.foo.com", record.Exchange);
+            Assert.AreEqual("10 mail.foo.com", record.ToString());
         }
 
     }

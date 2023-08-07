@@ -1,10 +1,11 @@
 ﻿using System.Linq;
+using System.Net;
 using DnsZone.Records;
 using NUnit.Framework;
 
 namespace DnsZone.Tests.Records {
     [TestFixture]
-    public class CaaResourceRecordTests {
+    public class AaaaResourceRecordTests {
 
         [Test]
         public void ParseTest() {
@@ -15,38 +16,34 @@ namespace DnsZone.Tests.Records {
 ; user@example.com
 $TTL 2d ; zone default = 2 days or 172800 seconds
 $ORIGIN example.com.
-example.com. IN	CAA 0	iodef		""mailto: hostmaster@example.com""
-    IN  CAA 0   issue       ""letsencrypt.org""";
+example.com.  IN  AAAA  2001:db8:10::1        ; IPv6 address for example.com
+ns            IN  AAAA  2001:db8:10::2        ; IPv6 address for ns.example.com";
             var zone = DnsZoneFile.Parse(str);
             Assert.AreEqual(2, zone.Records.Count);
 
-            Assert.IsAssignableFrom<CAAResourceRecord>(zone.Records.First());
+            Assert.IsAssignableFrom<AaaaResourceRecord>(zone.Records.First());
 
-            var record = (CAAResourceRecord)zone.Records.First();
+            var record = (AaaaResourceRecord)zone.Records.First();
             Assert.AreEqual("example.com", record.Name);
             Assert.AreEqual("IN", record.Class);
-            Assert.AreEqual(ResourceRecordType.CAA, record.Type);
-            Assert.AreEqual(0, record.Flag);
-            Assert.AreEqual("iodef", record.Tag);
-            Assert.AreEqual("mailto: hostmaster@example.com", record.Value);
-            Assert.AreEqual("0 iodef mailto: hostmaster@example.com", record.ToString());
+            Assert.AreEqual(ResourceRecordType.AAAA, record.Type);
+            Assert.AreEqual(IPAddress.Parse("2001:db8:10::1"), record.Address);
+            Assert.AreEqual("2001:db8:10::1", record.ToString());
         }
         
         [Test]
         public void OutputTest() {
             var zone = new DnsZoneFile();
 
-            var record = new CAAResourceRecord {
+            var record = new AaaaResourceRecord {
                 Name = "example.com",
                 Class = "IN",
-                Flag = 0,
-                Tag = "iodef",
-                Value = "letsencrypt.org"
+                Address = IPAddress.Parse("2001:db8:10::1"),
             };
             
             zone.Records.Add(record);
             var sOutput = zone.ToString();
-            Assert.AreEqual(";CAA records\r\nexample.com.\tIN\t\tCAA\t0\tiodef\t\"letsencrypt.org\"\t\r\n\r\n", sOutput);
+            Assert.AreEqual(";AAAA records\r\nexample.com.\tIN\t\tAAAA\t2001:db8:10::1\t\r\n\r\n", sOutput);
         }
     }
 }
