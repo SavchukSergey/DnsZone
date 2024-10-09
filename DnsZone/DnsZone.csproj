@@ -17,6 +17,6 @@
 	</None>
   </ItemGroup>
   <ItemGroup>
-	<ProjectReference Include="..\..\OKHOSTING.Core\src\Standard\OKHOSTING.Core\OKHOSTING.Core.csproj" />
+    <ProjectReference Include="..\..\..\OKHOSTING.Core\src\Standard\OKHOSTING.Core\OKHOSTING.Core.csproj" />
   </ItemGroup>
 </Project>
