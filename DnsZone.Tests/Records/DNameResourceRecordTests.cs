@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using DnsZone.Records;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace DnsZone.Tests.Records {
     [TestFixture]
@@ -17,15 +18,15 @@ $TTL 2d ; zone default = 2 days or 172800 seconds
 $ORIGIN example.com.
 subdomain.example.com. IN	DNAME  host.example.org.";
             var zone = DnsZoneFile.Parse(str);
-            Assert.AreEqual(1, zone.Records.Count);
+            ClassicAssert.AreEqual(1, zone.Records.Count);
 
-            Assert.IsAssignableFrom<DNameResourceRecord>(zone.Records.First());
+            ClassicAssert.IsAssignableFrom<DNameResourceRecord>(zone.Records.First());
 
             var record = (DNameResourceRecord)zone.Records.First();
-            Assert.AreEqual("subdomain.example.com", record.Name);
-            Assert.AreEqual("IN", record.Class);
-            Assert.AreEqual(ResourceRecordType.DNAME, record.Type);
-            Assert.AreEqual("host.example.org.", record.Target);
+            ClassicAssert.AreEqual("subdomain.example.com", record.Name);
+            ClassicAssert.AreEqual("IN", record.Class);
+            ClassicAssert.AreEqual(ResourceRecordType.DNAME, record.Type);
+            ClassicAssert.AreEqual("host.example.org.", record.Target);
         }
         
         [Test]
@@ -40,7 +41,7 @@ subdomain.example.com. IN	DNAME  host.example.org.";
             
             zone.Records.Add(record);
             var sOutput = zone.ToString();
-            Assert.AreEqual(";DNAME records\r\nsubdomain.example.com.\tIN\t\tDNAME\thost.example.org.\t\r\n\r\n", sOutput);
+            ClassicAssert.AreEqual(";DNAME records\r\nsubdomain.example.com.\tIN\t\tDNAME\thost.example.org.\t\r\n\r\n", sOutput);
         }
     }
 }

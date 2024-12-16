@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using DnsZone.Records;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace DnsZone.Tests.Records {
     [TestFixture]
@@ -23,15 +24,15 @@ _foobar._tcp    SRV 0 1 9 old-slow-box.example.com.
 *._tcp          SRV  0 0 0 .
 *._udp          SRV  0 0 0 .";
             var zone = DnsZoneFile.Parse(str);
-            Assert.AreEqual(6, zone.Records.Count);
+            ClassicAssert.AreEqual(6, zone.Records.Count);
 
-            Assert.IsAssignableFrom<SrvResourceRecord>(zone.Records.First());
+            ClassicAssert.IsAssignableFrom<SrvResourceRecord>(zone.Records.First());
 
             var record = (SrvResourceRecord)zone.Records.First();
-            Assert.AreEqual("_foobar._tcp.example.com", record.Name);
-            Assert.AreEqual(null, record.Class);
-            Assert.AreEqual(ResourceRecordType.SRV, record.Type);
-            Assert.AreEqual(0, record.Priority);
+            ClassicAssert.AreEqual("_foobar._tcp.example.com", record.Name);
+            ClassicAssert.AreEqual(null, record.Class);
+            ClassicAssert.AreEqual(ResourceRecordType.SRV, record.Type);
+            ClassicAssert.AreEqual(0, record.Priority);
         }
 
         [Test]
@@ -39,18 +40,18 @@ _foobar._tcp    SRV 0 1 9 old-slow-box.example.com.
             var record = new SrvResourceRecord {
                 Name = "_foobar._tcp.example.com"
             };
-            Assert.AreEqual("foobar", record.Service);
-            Assert.AreEqual("tcp", record.Protocol);
-            Assert.AreEqual("example.com", record.Host);
+            ClassicAssert.AreEqual("foobar", record.Service);
+            ClassicAssert.AreEqual("tcp", record.Protocol);
+            ClassicAssert.AreEqual("example.com", record.Host);
 
             record.Service = "test";
-            Assert.AreEqual("_test._tcp.example.com", record.Name);
+            ClassicAssert.AreEqual("_test._tcp.example.com", record.Name);
 
             record.Protocol = "udp";
-            Assert.AreEqual("_test._udp.example.com", record.Name);
+            ClassicAssert.AreEqual("_test._udp.example.com", record.Name);
 
             record.Host = "vcap.me";
-            Assert.AreEqual("_test._udp.vcap.me", record.Name);
+            ClassicAssert.AreEqual("_test._udp.vcap.me", record.Name);
         }
     }
 }

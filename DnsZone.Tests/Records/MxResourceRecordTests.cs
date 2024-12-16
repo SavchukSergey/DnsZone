@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using DnsZone.Records;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace DnsZone.Tests.Records {
     [TestFixture]
@@ -18,16 +19,16 @@ $ORIGIN example.com.
 @               IN     MX     10  mail.foo.com.
 @               IN     MX     20  mail2.foo.com.";
             var zone = DnsZoneFile.Parse(str);
-            Assert.AreEqual(2, zone.Records.Count);
+            ClassicAssert.AreEqual(2, zone.Records.Count);
 
-            Assert.IsAssignableFrom<MxResourceRecord>(zone.Records.First());
+            ClassicAssert.IsAssignableFrom<MxResourceRecord>(zone.Records.First());
 
             var record = (MxResourceRecord)zone.Records.First();
-            Assert.AreEqual("example.com", record.Name);
-            Assert.AreEqual("IN", record.Class);
-            Assert.AreEqual(ResourceRecordType.MX, record.Type);
-            Assert.AreEqual(10, record.Preference);
-            Assert.AreEqual("mail.foo.com", record.Exchange);
+            ClassicAssert.AreEqual("example.com", record.Name);
+            ClassicAssert.AreEqual("IN", record.Class);
+            ClassicAssert.AreEqual(ResourceRecordType.MX, record.Type);
+            ClassicAssert.AreEqual(10, record.Preference);
+            ClassicAssert.AreEqual("mail.foo.com", record.Exchange);
         }
 
     }

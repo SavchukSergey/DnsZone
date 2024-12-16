@@ -6,6 +6,7 @@ using DnsZone.Records;
 using DnsZone.Tokens;
 using NUnit.Framework;
 using System.Threading.Tasks;
+using NUnit.Framework.Legacy;
 
 namespace DnsZone.Tests {
     [TestFixture]
@@ -14,13 +15,13 @@ namespace DnsZone.Tests {
         [Test]
         public async Task ParseWhitespace() {
             var zone = await DnsZoneFile.LoadFromFileAsync(@"Samples/whitespace.com.zone", "whitespace.com");
-            Assert.IsNotNull(zone);
+            ClassicAssert.IsNotNull(zone);
         }
 
         [Test]
         public async Task Parse2Test() {
             var zone = await DnsZoneFile.LoadFromFileAsync(@"Samples/domain.com.zone", "domain.com");
-            Assert.IsNotNull(zone);
+            ClassicAssert.IsNotNull(zone);
         }
 
         [Test]
@@ -32,7 +33,7 @@ namespace DnsZone.Tests {
 ";
             try {
                 var zone = DnsZoneFile.Parse(str);
-                Assert.AreEqual(0, zone.Records.Count);
+                ClassicAssert.AreEqual(0, zone.Records.Count);
             } catch (TokenException exc) {
                 Console.WriteLine(exc.Token.Position.GetLine());
                 throw;
@@ -61,11 +62,11 @@ mail2         IN  A     192.0.2.4             ; IPv4 address for mail2.example.c
 mail3         IN  A     192.0.2.5             ; IPv4 address for mail3.example.com";
             try {
                 var zone = DnsZoneFile.Parse(str);
-                Assert.AreEqual(1, zone.Records.OfType<SoaResourceRecord>().Count());
-                Assert.AreEqual(2, zone.Records.OfType<NsResourceRecord>().Count());
-                Assert.AreEqual(3, zone.Records.OfType<MxResourceRecord>().Count());
-                Assert.AreEqual(5, zone.Records.OfType<AResourceRecord>().Count());
-                Assert.AreEqual(2, zone.Records.OfType<CNameResourceRecord>().Count());
+                ClassicAssert.AreEqual(1, zone.Records.OfType<SoaResourceRecord>().Count());
+                ClassicAssert.AreEqual(2, zone.Records.OfType<NsResourceRecord>().Count());
+                ClassicAssert.AreEqual(3, zone.Records.OfType<MxResourceRecord>().Count());
+                ClassicAssert.AreEqual(5, zone.Records.OfType<AResourceRecord>().Count());
+                ClassicAssert.AreEqual(2, zone.Records.OfType<CNameResourceRecord>().Count());
             } catch (TokenException exc) {
                 Console.WriteLine(exc.Token.Position.GetLine());
                 throw;
@@ -84,20 +85,20 @@ example.com.    IN    SOA   ns.example.com. hostmaster.example.com. (
                               3600       ; nx = nxdomain ttl = 1h
                               )";
             var zone = DnsZoneFile.Parse(str);
-            Assert.AreEqual(1, zone.Records.Count);
+            ClassicAssert.AreEqual(1, zone.Records.Count);
 
-            Assert.IsAssignableFrom<SoaResourceRecord>(zone.Records.First());
+            ClassicAssert.IsAssignableFrom<SoaResourceRecord>(zone.Records.First());
 
             var record = (SoaResourceRecord)zone.Records.First();
-            Assert.AreEqual("example.com", record.Name);
-            Assert.AreEqual("IN", record.Class);
-            Assert.AreEqual(ResourceRecordType.SOA, record.Type);
-            Assert.AreEqual("ns.example.com", record.NameServer);
-            Assert.AreEqual("2003080800", record.SerialNumber);
-            Assert.AreEqual(TimeSpan.FromDays(2), record.Refresh);
-            Assert.AreEqual(TimeSpan.FromMinutes(15), record.Retry);
-            Assert.AreEqual(TimeSpan.FromDays(14), record.Expiry);
-            Assert.AreEqual(TimeSpan.FromHours(1), record.Minimum);
+            ClassicAssert.AreEqual("example.com", record.Name);
+            ClassicAssert.AreEqual("IN", record.Class);
+            ClassicAssert.AreEqual(ResourceRecordType.SOA, record.Type);
+            ClassicAssert.AreEqual("ns.example.com", record.NameServer);
+            ClassicAssert.AreEqual("2003080800", record.SerialNumber);
+            ClassicAssert.AreEqual(TimeSpan.FromDays(2), record.Refresh);
+            ClassicAssert.AreEqual(TimeSpan.FromMinutes(15), record.Retry);
+            ClassicAssert.AreEqual(TimeSpan.FromDays(14), record.Expiry);
+            ClassicAssert.AreEqual(TimeSpan.FromHours(1), record.Minimum);
         }
 
         [Test]
@@ -118,15 +119,15 @@ mail       IN      AAAA      2001:db8::32
 mail       IN      AAAA      2001:db8::33
 squat      IN      AAAA      2001:db8:0:0:1::13  ; address in another subnet";
             var zone = DnsZoneFile.Parse(str);
-            Assert.AreEqual(10, zone.Records.Count);
+            ClassicAssert.AreEqual(10, zone.Records.Count);
 
-            Assert.IsAssignableFrom<AaaaResourceRecord>(zone.Records.First());
+            ClassicAssert.IsAssignableFrom<AaaaResourceRecord>(zone.Records.First());
 
             var record = (AaaaResourceRecord)zone.Records.First();
-            Assert.AreEqual("joe.example.com", record.Name);
-            Assert.AreEqual("IN", record.Class);
-            Assert.AreEqual(ResourceRecordType.AAAA, record.Type);
-            Assert.AreEqual(IPAddress.Parse("2001:db8::3"), record.Address);
+            ClassicAssert.AreEqual("joe.example.com", record.Name);
+            ClassicAssert.AreEqual("IN", record.Class);
+            ClassicAssert.AreEqual(ResourceRecordType.AAAA, record.Type);
+            ClassicAssert.AreEqual(IPAddress.Parse("2001:db8::3"), record.Address);
         }
 
         [Test]
@@ -138,15 +139,15 @@ $ORIGIN example.com.
 www        IN      CNAME  server1
 ftp        IN      CNAME  server1";
             var zone = DnsZoneFile.Parse(str);
-            Assert.AreEqual(2, zone.Records.Count);
+            ClassicAssert.AreEqual(2, zone.Records.Count);
 
-            Assert.IsAssignableFrom<CNameResourceRecord>(zone.Records.First());
+            ClassicAssert.IsAssignableFrom<CNameResourceRecord>(zone.Records.First());
 
             var record = (CNameResourceRecord)zone.Records.First();
-            Assert.AreEqual("www.example.com", record.Name);
-            Assert.AreEqual("IN", record.Class);
-            Assert.AreEqual(ResourceRecordType.CNAME, record.Type);
-            Assert.AreEqual("server1.example.com", record.CanonicalName);
+            ClassicAssert.AreEqual("www.example.com", record.Name);
+            ClassicAssert.AreEqual("IN", record.Class);
+            ClassicAssert.AreEqual(ResourceRecordType.CNAME, record.Type);
+            ClassicAssert.AreEqual("server1.example.com", record.CanonicalName);
         }
 
         [Test]
@@ -159,15 +160,15 @@ $ORIGIN 23.168.192.IN-ADDR.ARPA.
 17            IN      PTR     bill.example.com.
 74            IN      PTR     fred.example.com.";
             var zone = DnsZoneFile.Parse(str);
-            Assert.AreEqual(4, zone.Records.Count);
+            ClassicAssert.AreEqual(4, zone.Records.Count);
 
-            Assert.IsAssignableFrom<PtrResourceRecord>(zone.Records.First());
+            ClassicAssert.IsAssignableFrom<PtrResourceRecord>(zone.Records.First());
 
             var record = (PtrResourceRecord)zone.Records.First();
-            Assert.AreEqual("2.23.168.192.IN-ADDR.ARPA", record.Name);
-            Assert.AreEqual("IN", record.Class);
-            Assert.AreEqual(ResourceRecordType.PTR, record.Type);
-            Assert.AreEqual("joe.example.com", record.HostName);
+            ClassicAssert.AreEqual("2.23.168.192.IN-ADDR.ARPA", record.Name);
+            ClassicAssert.AreEqual("IN", record.Class);
+            ClassicAssert.AreEqual(ResourceRecordType.PTR, record.Type);
+            ClassicAssert.AreEqual("joe.example.com", record.HostName);
         }
 
         [Test]
@@ -180,15 +181,15 @@ alice  IN  A   192.168.2.1 ; real host name
 ns1    IN   A  192.168.2.1 ; service name
 alice  IN   A  192.168.2.1 ; host name (same IPv4)";
             var zone = DnsZoneFile.Parse(str);
-            Assert.AreEqual(3, zone.Records.Count);
+            ClassicAssert.AreEqual(3, zone.Records.Count);
 
-            Assert.IsAssignableFrom<AResourceRecord>(zone.Records.First());
+            ClassicAssert.IsAssignableFrom<AResourceRecord>(zone.Records.First());
 
             var record = (AResourceRecord)zone.Records.First();
-            Assert.AreEqual("alice.example.com", record.Name);
-            Assert.AreEqual("IN", record.Class);
-            Assert.AreEqual(ResourceRecordType.A, record.Type);
-            Assert.AreEqual(IPAddress.Parse("192.168.2.1"), record.Address);
+            ClassicAssert.AreEqual("alice.example.com", record.Name);
+            ClassicAssert.AreEqual("IN", record.Class);
+            ClassicAssert.AreEqual(ResourceRecordType.A, record.Type);
+            ClassicAssert.AreEqual(IPAddress.Parse("192.168.2.1"), record.Address);
         }
 
         [Test]
@@ -199,14 +200,14 @@ alice  IN   A  192.168.2.1 ; host name (same IPv4)";
 sub	600	IN	A	184.168.221.15
 ";
             var zone = DnsZoneFile.Parse(str, "test.com");
-            Assert.AreEqual(2, zone.Records.Count);
+            ClassicAssert.AreEqual(2, zone.Records.Count);
 
-            Assert.IsAssignableFrom<AResourceRecord>(zone.Records.First());
+            ClassicAssert.IsAssignableFrom<AResourceRecord>(zone.Records.First());
 
             var rootRecord = (AResourceRecord)zone.Records.First();
-            Assert.AreEqual("test.com", rootRecord.Name);
+            ClassicAssert.AreEqual("test.com", rootRecord.Name);
             var subRecord = (AResourceRecord)zone.Records.Last();
-            Assert.AreEqual("sub.test.com", subRecord.Name);
+            ClassicAssert.AreEqual("sub.test.com", subRecord.Name);
         }
 
         [Test]
@@ -216,7 +217,7 @@ sub	600	IN	A	184.168.221.15
 @	600	IN	A	184.168.221.14
 sub	600	IN	A	184.168.221.15
 ";
-            Assert.Throws<TokenException>(() => DnsZoneFile.Parse(str));
+            ClassicAssert.Throws<TokenException>(() => DnsZoneFile.Parse(str));
         }
 
 
@@ -235,7 +236,7 @@ sub	600	IN	A	184.168.221.15
                 Ttl = TimeSpan.FromMinutes(15),
                 Address = IPAddress.Parse("127.0.0.1")
             });
-            Assert.IsNotNull(zone.ToString());
+            ClassicAssert.IsNotNull(zone.ToString());
         }
 
         [Test]
@@ -273,32 +274,32 @@ sub	600	IN	A	184.168.221.15
             });
 
             var filtered = zone.Filter("example.com");
-            Assert.AreEqual(3, filtered.Records.Count);
-            Assert.IsTrue(filtered.Records.OfType<AResourceRecord>().Any(item => Equals(item.Address, IPAddress.Parse("127.0.0.1"))));
-            Assert.IsTrue(filtered.Records.OfType<AResourceRecord>().Any(item => Equals(item.Address, IPAddress.Parse("127.0.0.2"))));
-            Assert.IsTrue(filtered.Records.OfType<AResourceRecord>().Any(item => Equals(item.Address, IPAddress.Parse("127.0.0.3"))));
+            ClassicAssert.AreEqual(3, filtered.Records.Count);
+            ClassicAssert.IsTrue(filtered.Records.OfType<AResourceRecord>().Any(item => Equals(item.Address, IPAddress.Parse("127.0.0.1"))));
+            ClassicAssert.IsTrue(filtered.Records.OfType<AResourceRecord>().Any(item => Equals(item.Address, IPAddress.Parse("127.0.0.2"))));
+            ClassicAssert.IsTrue(filtered.Records.OfType<AResourceRecord>().Any(item => Equals(item.Address, IPAddress.Parse("127.0.0.3"))));
 
 
             filtered = zone.Filter("test-example.com");
-            Assert.AreEqual(1, filtered.Records.Count);
-            Assert.IsTrue(filtered.Records.OfType<AResourceRecord>().Any(item => Equals(item.Address, IPAddress.Parse("127.0.0.4"))));
+            ClassicAssert.AreEqual(1, filtered.Records.Count);
+            ClassicAssert.IsTrue(filtered.Records.OfType<AResourceRecord>().Any(item => Equals(item.Address, IPAddress.Parse("127.0.0.4"))));
 
             filtered = zone.Filter("example-test-example.com");
-            Assert.AreEqual(1, filtered.Records.Count);
-            Assert.IsTrue(filtered.Records.OfType<AResourceRecord>().Any(item => Equals(item.Address, IPAddress.Parse("127.0.0.5"))));
+            ClassicAssert.AreEqual(1, filtered.Records.Count);
+            ClassicAssert.IsTrue(filtered.Records.OfType<AResourceRecord>().Any(item => Equals(item.Address, IPAddress.Parse("127.0.0.5"))));
         }
 
         [Test]
         public void IncludeTest() {
             var embedded = new EmbeddedDnsSource(GetType().Assembly, GetType().Namespace + ".Samples", "root_com.zone");
             var zone = DnsZoneFile.Parse(embedded);
-            Assert.AreEqual(2, zone.Records.Count);
+            ClassicAssert.AreEqual(2, zone.Records.Count);
 
             var rootA = zone.Single<AResourceRecord>("root.com");
-            Assert.AreEqual(IPAddress.Parse("192.168.0.1"), rootA.Address);
+            ClassicAssert.AreEqual(IPAddress.Parse("192.168.0.1"), rootA.Address);
 
             var wwwA = zone.Single<AResourceRecord>("www.root.com");
-            Assert.AreEqual(IPAddress.Parse("192.168.0.2"), wwwA.Address);
+            ClassicAssert.AreEqual(IPAddress.Parse("192.168.0.2"), wwwA.Address);
         }
     }
 }

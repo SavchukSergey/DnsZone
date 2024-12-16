@@ -2,6 +2,7 @@ using System.Linq;
 using System.Net;
 using DnsZone.Records;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace DnsZone.Tests.Records {
     [TestFixture]
@@ -19,15 +20,15 @@ $ORIGIN example.com.
 example.com.  IN  AAAA  2001:db8:10::1        ; IPv6 address for example.com
 ns            IN  AAAA  2001:db8:10::2        ; IPv6 address for ns.example.com";
             var zone = DnsZoneFile.Parse(str);
-            Assert.AreEqual(2, zone.Records.Count);
+            ClassicAssert.AreEqual(2, zone.Records.Count);
 
-            Assert.IsAssignableFrom<AaaaResourceRecord>(zone.Records.First());
+            ClassicAssert.IsAssignableFrom<AaaaResourceRecord>(zone.Records.First());
 
             var record = (AaaaResourceRecord)zone.Records.First();
-            Assert.AreEqual("example.com", record.Name);
-            Assert.AreEqual("IN", record.Class);
-            Assert.AreEqual(ResourceRecordType.AAAA, record.Type);
-            Assert.AreEqual(IPAddress.Parse("2001:db8:10::1"), record.Address);
+            ClassicAssert.AreEqual("example.com", record.Name);
+            ClassicAssert.AreEqual("IN", record.Class);
+            ClassicAssert.AreEqual(ResourceRecordType.AAAA, record.Type);
+            ClassicAssert.AreEqual(IPAddress.Parse("2001:db8:10::1"), record.Address);
         }
 
         [Test]
@@ -42,7 +43,7 @@ ns            IN  AAAA  2001:db8:10::2        ; IPv6 address for ns.example.com"
 
             zone.Records.Add(record);
             var sOutput = zone.ToString();
-            Assert.AreEqual(";AAAA records\r\nexample.com.\tIN\t\tAAAA\t2001:db8:10::1\t\r\n\r\n", sOutput);
+            ClassicAssert.AreEqual(";AAAA records\r\nexample.com.\tIN\t\tAAAA\t2001:db8:10::1\t\r\n\r\n", sOutput);
         }
     }
 }

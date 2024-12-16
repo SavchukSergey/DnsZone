@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Samples\**\*.*" />
@@ -10,8 +10,8 @@
     <ProjectReference Include="..\DnsZone\DnsZone.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <packagereference Include="Microsoft.NET.Test.Sdk" Version="16.1.0"></packagereference>
-    <PackageReference Include="NUnit" Version="3.12.0" />
-    <PackageReference Include="NUnit3TestAdapter" Version="3.13.0" />
+    <packagereference Include="Microsoft.NET.Test.Sdk" Version="17.12.0"></packagereference>
+    <PackageReference Include="NUnit" Version="4.3.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.6.0" />
   </ItemGroup>
 </Project>

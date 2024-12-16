@@ -1,5 +1,6 @@
 ﻿using System;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace DnsZone.Tests {
     [TestFixture]
@@ -14,7 +15,7 @@ namespace DnsZone.Tests {
         public void ParseTimeSpanTests(string zoneStr, string spanStr) {
             var actual = DnsZoneUtils.ParseTimeSpan(zoneStr);
             var expected = TimeSpan.Parse(spanStr);
-            Assert.AreEqual(expected, actual);
+            ClassicAssert.AreEqual(expected, actual);
         }
 
         [TestCase("2w", "14.0:0:0")]
@@ -26,7 +27,7 @@ namespace DnsZone.Tests {
         public void FormatTimeSpanTests(string expected, string span) {
             var val = TimeSpan.Parse(span);
             var actual = DnsZoneUtils.FormatTimeSpan(val);
-            Assert.AreEqual(expected, actual);
+            ClassicAssert.AreEqual(expected, actual);
         }
     }
 }

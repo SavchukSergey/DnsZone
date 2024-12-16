@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using DnsZone.Records;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace DnsZone.Tests.Records {
     [TestFixture]
@@ -18,15 +19,15 @@ $ORIGIN example.com.
 test           IN  ALIAS     host.external.org          ; Alias for test.example.com
 alias1         IN  ALIAS     new.origin.com             ; Alias for alias1.example.com";
             var zone = DnsZoneFile.Parse(str);
-            Assert.AreEqual(2, zone.Records.Count);
+            ClassicAssert.AreEqual(2, zone.Records.Count);
 
-            Assert.IsAssignableFrom<AliasResourceRecord>(zone.Records.First());
+            ClassicAssert.IsAssignableFrom<AliasResourceRecord>(zone.Records.First());
 
             var record = (AliasResourceRecord)zone.Records.First();
-            Assert.AreEqual("test.example.com", record.Name);
-            Assert.AreEqual("IN", record.Class);
-            Assert.AreEqual(ResourceRecordType.ALIAS, record.Type);
-            Assert.AreEqual("host.external.org", record.Target);
+            ClassicAssert.AreEqual("test.example.com", record.Name);
+            ClassicAssert.AreEqual("IN", record.Class);
+            ClassicAssert.AreEqual(ResourceRecordType.ALIAS, record.Type);
+            ClassicAssert.AreEqual("host.external.org", record.Target);
         }
         
         [Test]
@@ -41,7 +42,7 @@ alias1         IN  ALIAS     new.origin.com             ; Alias for alias1.examp
             
             zone.Records.Add(record);
             var sOutput = zone.ToString();
-            Assert.AreEqual(";ALIAS records\r\nexample.com.\tIN\t\tALIAS\thost.external.org\t\r\n\r\n", sOutput);
+            ClassicAssert.AreEqual(";ALIAS records\r\nexample.com.\tIN\t\tALIAS\thost.external.org\t\r\n\r\n", sOutput);
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using DnsZone.Records;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace DnsZone.Tests.Records
 {
@@ -19,15 +20,15 @@ $ORIGIN example.com.
 @               IN      NS     ns1.example.net.
 @               IN      NS     ns1.example.org.";
             var zone = DnsZoneFile.Parse(str);
-            Assert.AreEqual(2, zone.Records.Count);
+            ClassicAssert.AreEqual(2, zone.Records.Count);
 
-            Assert.IsAssignableFrom<NsResourceRecord>(zone.Records.First());
+            ClassicAssert.IsAssignableFrom<NsResourceRecord>(zone.Records.First());
 
             var record = (NsResourceRecord)zone.Records.First();
-            Assert.AreEqual("example.com", record.Name);
-            Assert.AreEqual("IN", record.Class);
-            Assert.AreEqual(ResourceRecordType.NS, record.Type);
-            Assert.AreEqual("ns1.example.net", record.NameServer);
+            ClassicAssert.AreEqual("example.com", record.Name);
+            ClassicAssert.AreEqual("IN", record.Class);
+            ClassicAssert.AreEqual(ResourceRecordType.NS, record.Type);
+            ClassicAssert.AreEqual("ns1.example.net", record.NameServer);
         }
 
     }
