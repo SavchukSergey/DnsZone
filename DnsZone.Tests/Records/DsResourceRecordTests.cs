@@ -47,7 +47,7 @@ example.com.        IN DS 62910 7 1 1D6AC75083F3CEC31861993E325E0EEC7E97D1DD";
             
             zone.Records.Add(record);
             var sOutput = zone.ToString();
-            ClassicAssert.AreEqual(";DS records\r\nexample.com.\tIN\t\tDS\t52037\t1\t1\t378929E92D7DA04267EE87E802D75C5CA1B5D280\t\r\n\r\n", sOutput);
+            ClassicAssert.AreEqual(";DS records\nexample.com.\tIN\t\tDS\t52037\t1\t1\t378929E92D7DA04267EE87E802D75C5CA1B5D280\t\n\n", sOutput);
         }
     }
 }

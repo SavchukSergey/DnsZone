@@ -52,7 +52,7 @@ new.example.com.  IN  NAPTR  100  10  ""A"" """"  ""!^.*$!prodserver.example.com
             
             zone.Records.Add(record);
             var sOutput = zone.ToString();
-            ClassicAssert.AreEqual(";NAPTR records\r\nexample.com.\tIN\t\tNAPTR\t100\t10\t\"A\"\t\"\"\t\"\"\tprodserver.example.com\t\r\n\r\n", sOutput);
+            ClassicAssert.AreEqual(";NAPTR records\nexample.com.\tIN\t\tNAPTR\t100\t10\t\"A\"\t\"\"\t\"\"\tprodserver.example.com\t\n\n", sOutput);
         }
     }
 }

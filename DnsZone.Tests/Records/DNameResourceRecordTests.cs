@@ -41,7 +41,7 @@ subdomain.example.com. IN	DNAME  host.example.org.";
             
             zone.Records.Add(record);
             var sOutput = zone.ToString();
-            ClassicAssert.AreEqual(";DNAME records\r\nsubdomain.example.com.\tIN\t\tDNAME\thost.example.org.\t\r\n\r\n", sOutput);
+            ClassicAssert.AreEqual(";DNAME records\nsubdomain.example.com.\tIN\t\tDNAME\thost.example.org.\t\n\n", sOutput);
         }
     }
 }

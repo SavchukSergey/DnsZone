@@ -43,7 +43,7 @@ www IN	LUA A ""ifportup(443, {'192.0.2.1', '192.0.2.2'})""";
             
             zone.Records.Add(record);
             var sOutput = zone.ToString();
-            ClassicAssert.AreEqual(";LUA records\r\nexample.com.\tIN\t\tLUA\tA\t\"ifportup(443, {'192.0.2.1', '192.0.2.2'})\"\t\r\n\r\n", sOutput);
+            ClassicAssert.AreEqual(";LUA records\nexample.com.\tIN\t\tLUA\tA\t\"ifportup(443, {'192.0.2.1', '192.0.2.2'})\"\t\n\n", sOutput);
         }
     }
 }

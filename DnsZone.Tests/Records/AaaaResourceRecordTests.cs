@@ -43,7 +43,7 @@ ns            IN  AAAA  2001:db8:10::2        ; IPv6 address for ns.example.com"
 
             zone.Records.Add(record);
             var sOutput = zone.ToString();
-            ClassicAssert.AreEqual(";AAAA records\r\nexample.com.\tIN\t\tAAAA\t2001:db8:10::1\t\r\n\r\n", sOutput);
+            ClassicAssert.AreEqual(";AAAA records\nexample.com.\tIN\t\tAAAA\t2001:db8:10::1\t\n\n", sOutput);
         }
     }
 }

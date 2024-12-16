@@ -44,7 +44,7 @@ sil.example.com. IN SSHFP 2 1 450c7d19d5da9a3a5b7c18992d1fbde15d8dad34";
             };
             zone.Records.Add(record);
             var sOutput = zone.ToString();
-            ClassicAssert.AreEqual(";SSHFP records\r\nsil.example.com.\tIN\t\tSSHFP\t3\t1\t450c7d19d5da9a3a5b7c19992d1fbde15d8dad34\t\r\n\r\n", sOutput);
+            ClassicAssert.AreEqual(";SSHFP records\nsil.example.com.\tIN\t\tSSHFP\t3\t1\t450c7d19d5da9a3a5b7c19992d1fbde15d8dad34\t\n\n", sOutput);
         }
     }
 }

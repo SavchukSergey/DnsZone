@@ -20,7 +20,7 @@ namespace DnsZone.Formatter {
 
         public DnsZoneFile Zone { get; }
 
-        public StringBuilder Sb { get; }
+        private StringBuilder Sb { get; }
 
         public DnsZoneFormatterContext(DnsZoneFile zone, StringBuilder sb) {
             Sb = sb;
@@ -61,8 +61,7 @@ namespace DnsZone.Formatter {
             Sb.Append(TAB_CHAR);
         }
 
-        public void WriteTag(string val)
-        {
+        public void WriteTag(string val) {
             Sb.Append(val);
             Sb.Append(TAB_CHAR);
         }
@@ -81,10 +80,10 @@ namespace DnsZone.Formatter {
         }
 
         public void WriteOrigin(string origin) {
-            Sb.AppendLine($"$ORIGIN {origin}.");
+            AppendLine($"$ORIGIN {origin}.");
         }
 
-        public void WriteResourceRecordType(ResourceRecordType  val) {
+        public void WriteResourceRecordType(ResourceRecordType val) {
             Sb.Append(DnsZoneUtils.FormatResourceRecordType(val));
             Sb.Append(TAB_CHAR);
         }
@@ -98,6 +97,15 @@ namespace DnsZone.Formatter {
                 return val.Substring(0, val.Length - relativeSuffix.Length);
             }
             return val + ".";
+        }
+
+        public void AppendLine(string value) {
+            Sb.Append(value);
+            Sb.Append('\n');
+        }
+
+        public void AppendLine() {
+            Sb.Append('\n');
         }
 
     }

@@ -43,7 +43,7 @@ example.com. IN HINFO ""INTEL-386"" ""Windows""";
             
             zone.Records.Add(record);
             var sOutput = zone.ToString();
-            ClassicAssert.AreEqual(";HINFO records\r\nexample.com.\tIN\t\tHINFO\t\"INTEL-386\"\t\"Windows\"\t\r\n\r\n", sOutput);
+            ClassicAssert.AreEqual(";HINFO records\nexample.com.\tIN\t\tHINFO\t\"INTEL-386\"\t\"Windows\"\t\n\n", sOutput);
         }
     }
 }

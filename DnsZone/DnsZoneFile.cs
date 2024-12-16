@@ -55,16 +55,16 @@ namespace DnsZone {
             }
             var writer = new ResourceRecordWriter();
             foreach (var recordGroup in Records.GroupBy(item => item.Type)) {
-                context.Sb.AppendLine($";{recordGroup.Key} records");
+                context.AppendLine($";{recordGroup.Key} records");
                 foreach (var record in recordGroup) {
                     context.WriteAndCompressDomainName(record.Name);
                     context.WriteClass(record.Class);
                     context.WriteTimeSpan(record.Ttl);
                     context.WriteResourceRecordType(record.Type);
                     record.AcceptVistor(writer, context);
-                    context.Sb.AppendLine();
+                    context.AppendLine();
                 }
-                context.Sb.AppendLine();
+                context.AppendLine();
             }
             return sb.ToString();
         }

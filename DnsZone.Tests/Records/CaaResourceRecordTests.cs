@@ -46,7 +46,7 @@ example.com. IN	CAA 0	iodef		""mailto: hostmaster@example.com""
 
             zone.Records.Add(record);
             var sOutput = zone.ToString();
-            ClassicAssert.AreEqual(";CAA records\r\nexample.com.\tIN\t\tCAA\t0\tiodef\t\"letsencrypt.org\"\t\r\n\r\n", sOutput);
+            ClassicAssert.AreEqual(";CAA records\nexample.com.\tIN\t\tCAA\t0\tiodef\t\"letsencrypt.org\"\t\n\n", sOutput);
         }
 
     }
