@@ -44,7 +44,7 @@ _443._tcp.keyserver.example.com. IN TLSA 3 1 1 e677073271638e936eb3846c7aacfd3d3
                 CertificateAssociationData = @"dd5f45b479cc19e697c33c676161df9e6466a9a728584b1c881e18222f9ada31"
             };
             zone.Records.Add(record);
-            string sOutput = zone.ToString();
+            var sOutput = zone.ToString();
             Assert.AreEqual(";TLSA records\r\n_443._tcp.sil.example.com.\tIN\t\tTLSA\t3\t1\t2\tdd5f45b479cc19e697c33c676161df9e6466a9a728584b1c881e18222f9ada31\t\r\n\r\n", sOutput);
         }
 

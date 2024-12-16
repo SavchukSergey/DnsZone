@@ -28,8 +28,7 @@ www           IN  CNAME example.com.          ; www.example.com is an alias for 
 wwwtest       IN  CNAME www                   ; wwwtest.example.com is another alias for www.example.com
 mail          IN  A     192.0.2.3             ; IPv4 address for mail.example.com
 mail2         IN  A     192.0.2.4             ; IPv4 address for mail2.example.com
-mail3         IN  A     192.0.2.5             ; IPv4 address for mail3.example.com
-testcaa       IN  CAA   0 iodef ""mailto: hostmaster@example.com""";
+mail3         IN  A     192.0.2.5             ; IPv4 address for mail3.example.com";
 var zone = DnsZoneFile.Parse(content);
 ```
 

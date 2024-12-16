@@ -8,4 +8,5 @@ trim_trailing_whitespace = true
 csharp_new_line_before_open_brace = none
 csharp_new_line_before_catch = false
 csharp_new_line_before_else = false
+csharp_style_prefer_primary_constructors = false
 dotnet_sort_system_directives_first = true

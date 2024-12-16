@@ -4,7 +4,7 @@ using NUnit.Framework;
 
 namespace DnsZone.Tests.Records {
     [TestFixture]
-    public class CaaResourceRecordTests {
+    public class HInfoResourceRecordTests {
 
         [Test]
         public void ParseTest() {
@@ -15,38 +15,34 @@ namespace DnsZone.Tests.Records {
 ; user@example.com
 $TTL 2d ; zone default = 2 days or 172800 seconds
 $ORIGIN example.com.
-example.com. IN	CAA 0	iodef		""mailto: hostmaster@example.com""
-    IN  CAA 0   issue       ""letsencrypt.org""";
+example.com. IN HINFO ""INTEL-386"" ""Windows""";
             var zone = DnsZoneFile.Parse(str);
-            Assert.AreEqual(2, zone.Records.Count);
+            Assert.AreEqual(1, zone.Records.Count);
 
-            Assert.IsAssignableFrom<CAAResourceRecord>(zone.Records.First());
+            Assert.IsAssignableFrom<HInfoResourceRecord>(zone.Records.First());
 
-            var record = (CAAResourceRecord)zone.Records.First();
+            var record = (HInfoResourceRecord)zone.Records.First();
             Assert.AreEqual("example.com", record.Name);
             Assert.AreEqual("IN", record.Class);
-            Assert.AreEqual(ResourceRecordType.CAA, record.Type);
-            Assert.AreEqual(0, record.Flag);
-            Assert.AreEqual("iodef", record.Tag);
-            Assert.AreEqual("mailto: hostmaster@example.com", record.Value);
+            Assert.AreEqual(ResourceRecordType.HINFO, record.Type);
+            Assert.AreEqual("INTEL-386", record.Cpu);
+            Assert.AreEqual("Windows", record.Os);
         }
         
         [Test]
         public void OutputTest() {
             var zone = new DnsZoneFile();
 
-            var record = new CAAResourceRecord {
+            var record = new HInfoResourceRecord {
                 Name = "example.com",
                 Class = "IN",
-                Flag = 0,
-                Tag = "iodef",
-                Value = "letsencrypt.org"
+                Cpu = "INTEL-386",
+                Os = "Windows",
             };
-
+            
             zone.Records.Add(record);
             var sOutput = zone.ToString();
-            Assert.AreEqual(";CAA records\r\nexample.com.\tIN\t\tCAA\t0\tiodef\t\"letsencrypt.org\"\t\r\n\r\n", sOutput);
+            Assert.AreEqual(";HINFO records\r\nexample.com.\tIN\t\tHINFO\t\"INTEL-386\"\t\"Windows\"\t\r\n\r\n", sOutput);
         }
-
     }
 }

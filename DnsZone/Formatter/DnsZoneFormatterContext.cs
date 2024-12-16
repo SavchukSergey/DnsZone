@@ -27,7 +27,7 @@ namespace DnsZone.Formatter {
             Zone = zone;
         }
 
-        public void WritePreference(ushort val) {
+        public void WriteU16(ushort val) {
             Sb.Append(val);
             Sb.Append(TAB_CHAR);
         }

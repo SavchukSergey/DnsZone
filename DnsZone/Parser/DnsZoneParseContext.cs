@@ -49,9 +49,9 @@ namespace DnsZone.Parser {
             };
         }
 
-        public ushort ReadPreference() {
+        public ushort ReadU16() {
             var token = Tokens.Dequeue();
-            if (token.Type != TokenType.Literal) throw new TokenException("preference expected", token);
+            if (token.Type != TokenType.Literal) throw new TokenException("U16 value expected", token);
             return ushort.Parse(token.StringValue);
         }
 
@@ -74,6 +74,12 @@ namespace DnsZone.Parser {
         public string ReadString() {
             var token = Tokens.Dequeue();
             if (token.Type != TokenType.Literal) throw new TokenException("string expected", token);
+            return token.StringValue;
+        }
+
+        public string ReadStringValue() {
+            var token = Tokens.Dequeue();
+            if (token.Type != TokenType.QuotedString) throw new TokenException("string expected", token);
             return token.StringValue;
         }
 

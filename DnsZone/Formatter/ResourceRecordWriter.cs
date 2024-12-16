@@ -13,35 +13,75 @@ namespace DnsZone.Formatter {
             return record;
         }
 
+        public ResourceRecord Visit(AliasResourceRecord record, DnsZoneFormatterContext context) {
+            context.WriteDomainName(record.Target);
+            return record;
+        }
+
         public ResourceRecord Visit(CNameResourceRecord record, DnsZoneFormatterContext context) {
             context.WriteAndCompressDomainName(record.CanonicalName);
             return record;
         }
 
+        public ResourceRecord Visit(DNameResourceRecord record, DnsZoneFormatterContext context) {
+            context.WriteDomainName(record.Target);
+            return record;
+        }
+
+        public ResourceRecord Visit(DsResourceRecord record, DnsZoneFormatterContext context) {
+            context.WriteTag(record.KeyTag);
+            context.WriteU16(record.Algorithm);
+            context.WriteU16(record.HashType);
+            context.WriteTag(record.Hash);
+            return record;
+        }
+
+        public ResourceRecord Visit(HInfoResourceRecord record, DnsZoneFormatterContext context) {
+            context.WriteString(record.Cpu);
+            context.WriteString(record.Os);
+            return record;
+        }
+
+        public ResourceRecord Visit(LuaResourceRecord record, DnsZoneFormatterContext context) {
+            context.WriteTag(record.TargetType);
+            context.WriteString(record.Script);
+            return record;
+        }
+
         public ResourceRecord Visit(MxResourceRecord record, DnsZoneFormatterContext context) {
-            context.WritePreference(record.Preference);
+            context.WriteU16(record.Preference);
             context.WriteAndCompressDomainName(record.Exchange);
             return record;
         }
 
+        public ResourceRecord Visit(NaptrResourceRecord record, DnsZoneFormatterContext context) {
+            context.WriteU16(record.Order);
+            context.WriteU16(record.Preference);
+            context.WriteString(record.Flags);
+            context.WriteString(record.Services);
+            context.WriteString(record.Regexp);
+            context.WriteDomainName(record.Replacement);
+            return record;
+        }
+
         public ResourceRecord Visit(CAAResourceRecord record, DnsZoneFormatterContext context) {
-            context.WritePreference(record.Flag);
+            context.WriteU16(record.Flag);
             context.WriteTag(record.Tag);
             context.WriteString(record.Value);
             return record;
         }
 
         public ResourceRecord Visit(TLSAResourceRecord record, DnsZoneFormatterContext context) {
-            context.WritePreference(record.CertificateUsage);
-            context.WritePreference(record.Selector);
-            context.WritePreference(record.MatchingType);
+            context.WriteU16(record.CertificateUsage);
+            context.WriteU16(record.Selector);
+            context.WriteU16(record.MatchingType);
             context.WriteTag(record.CertificateAssociationData);
             return record;
         }
 
         public ResourceRecord Visit(SSHFPResourceRecord record, DnsZoneFormatterContext context) {
-            context.WritePreference(record.AlgorithmNumber);
-            context.WritePreference(record.FingerprintType);
+            context.WriteU16(record.AlgorithmNumber);
+            context.WriteU16(record.FingerprintType);
             context.WriteTag(record.Fingerprint);
             return record;
         }
@@ -68,9 +108,9 @@ namespace DnsZone.Formatter {
         }
 
         public ResourceRecord Visit(SrvResourceRecord record, DnsZoneFormatterContext context) {
-            context.WritePreference(record.Priority);
-            context.WritePreference(record.Weight);
-            context.WritePreference(record.Port);
+            context.WriteU16(record.Priority);
+            context.WriteU16(record.Weight);
+            context.WriteU16(record.Port);
             context.WriteAndCompressDomainName(record.Target);
             return record;
         }

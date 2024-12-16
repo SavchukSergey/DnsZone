@@ -2,15 +2,12 @@
 using DnsZone.Records;
 using NUnit.Framework;
 
-namespace DnsZone.Tests.Records
-{
+namespace DnsZone.Tests.Records {
     [TestFixture]
-    public class SshfpResourceRecordTests
-    {
+    public class SshfpResourceRecordTests {
 
         [Test]
-        public void ParseTest()
-        {
+        public void ParseTest() {
             const string str = @"
 ; zone fragment example.com
 ; mail servers in the same zone
@@ -34,12 +31,10 @@ sil.example.com. IN SSHFP 2 1 450c7d19d5da9a3a5b7c18992d1fbde15d8dad34";
         }
 
         [Test]
-        public void OutputTest()
-        {
+        public void OutputTest() {
             var zone = new DnsZoneFile();
 
-            var record = new SSHFPResourceRecord
-            {
+            var record = new SSHFPResourceRecord {
                 Name = "sil.example.com",
                 Class = "IN",
                 AlgorithmNumber = 3,
@@ -47,7 +42,7 @@ sil.example.com. IN SSHFP 2 1 450c7d19d5da9a3a5b7c18992d1fbde15d8dad34";
                 Fingerprint = @"450c7d19d5da9a3a5b7c19992d1fbde15d8dad34"
             };
             zone.Records.Add(record);
-            string sOutput = zone.ToString();
+            var sOutput = zone.ToString();
             Assert.AreEqual(";SSHFP records\r\nsil.example.com.\tIN\t\tSSHFP\t3\t1\t450c7d19d5da9a3a5b7c19992d1fbde15d8dad34\t\r\n\r\n", sOutput);
         }
     }

@@ -2,7 +2,7 @@
 using DnsZone.Records;
 using NUnit.Framework;
 
-namespace DnsZone.Tests {
+namespace DnsZone.Tests.Records {
     [TestFixture]
     public class TxtResourceRecordTests {
 

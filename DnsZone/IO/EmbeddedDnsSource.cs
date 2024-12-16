@@ -18,8 +18,7 @@ namespace DnsZone.IO {
         public string LoadContent(string fileName) {
             fileName = fileName ?? _startFile;
             var name = GetFullName(fileName);
-            var stream = _assembly.GetManifestResourceStream(name);
-            if (stream == null) throw new Exception($"file {fileName} is not found");
+            var stream = _assembly.GetManifestResourceStream(name) ?? throw new Exception($"file {fileName} is not found");
             var reader = new StreamReader(stream);
             return reader.ReadToEnd();
         }
