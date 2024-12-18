@@ -102,55 +102,6 @@ example.com.    IN    SOA   ns.example.com. hostmaster.example.com. (
         }
 
         [Test]
-        public void AaaaRecordParseTest() {
-            const string str = @"
-; zone fragment for example.com
-$TTL 2d ; zone default = 2 days or 172800 seconds
-$ORIGIN example.com.
-joe        IN      AAAA      2001:db8::3  ; joe & www = same ip
-www        IN      AAAA      2001:db8::3
-; functionally the same as the record above
-www.example.com.   AAAA      2001:db8::3
-fred  3600 IN      AAAA      2001:db8::4  ; ttl =3600 overrides $TTL default
-ftp        IN      AAAA      2001:db8::5 ; round robin with next
-           IN      AAAA      2001:db8::6
-mail       IN      AAAA      2001:db8::7  ; mail = round robin
-mail       IN      AAAA      2001:db8::32
-mail       IN      AAAA      2001:db8::33
-squat      IN      AAAA      2001:db8:0:0:1::13  ; address in another subnet";
-            var zone = DnsZoneFile.Parse(str);
-            ClassicAssert.AreEqual(10, zone.Records.Count);
-
-            ClassicAssert.IsAssignableFrom<AaaaResourceRecord>(zone.Records.First());
-
-            var record = (AaaaResourceRecord)zone.Records.First();
-            ClassicAssert.AreEqual("joe.example.com", record.Name);
-            ClassicAssert.AreEqual("IN", record.Class);
-            ClassicAssert.AreEqual(ResourceRecordType.AAAA, record.Type);
-            ClassicAssert.AreEqual(IPAddress.Parse("2001:db8::3"), record.Address);
-        }
-
-        [Test]
-        public void CNameRecordParseTest() {
-            const string str = @"
-; zone fragment for example.com
-$TTL 2d ; zone default = 2 days or 172800 seconds
-$ORIGIN example.com.
-www        IN      CNAME  server1
-ftp        IN      CNAME  server1";
-            var zone = DnsZoneFile.Parse(str);
-            ClassicAssert.AreEqual(2, zone.Records.Count);
-
-            ClassicAssert.IsAssignableFrom<CNameResourceRecord>(zone.Records.First());
-
-            var record = (CNameResourceRecord)zone.Records.First();
-            ClassicAssert.AreEqual("www.example.com", record.Name);
-            ClassicAssert.AreEqual("IN", record.Class);
-            ClassicAssert.AreEqual(ResourceRecordType.CNAME, record.Type);
-            ClassicAssert.AreEqual("server1.example.com", record.CanonicalName);
-        }
-
-        [Test]
         public void PtrRecordParseTest() {
             const string str = @"
 $TTL 2d ; 172800 secs
@@ -169,27 +120,6 @@ $ORIGIN 23.168.192.IN-ADDR.ARPA.
             ClassicAssert.AreEqual("IN", record.Class);
             ClassicAssert.AreEqual(ResourceRecordType.PTR, record.Type);
             ClassicAssert.AreEqual("joe.example.com", record.HostName);
-        }
-
-        [Test]
-        public void ARecordParseTest() {
-            const string str = @"
-; zone file snippet
-$ORIGIN example.com.
-$TTL 2d ; 172800 secs
-alice  IN  A   192.168.2.1 ; real host name
-ns1    IN   A  192.168.2.1 ; service name
-alice  IN   A  192.168.2.1 ; host name (same IPv4)";
-            var zone = DnsZoneFile.Parse(str);
-            ClassicAssert.AreEqual(3, zone.Records.Count);
-
-            ClassicAssert.IsAssignableFrom<AResourceRecord>(zone.Records.First());
-
-            var record = (AResourceRecord)zone.Records.First();
-            ClassicAssert.AreEqual("alice.example.com", record.Name);
-            ClassicAssert.AreEqual("IN", record.Class);
-            ClassicAssert.AreEqual(ResourceRecordType.A, record.Type);
-            ClassicAssert.AreEqual(IPAddress.Parse("192.168.2.1"), record.Address);
         }
 
         [Test]
@@ -217,7 +147,7 @@ sub	600	IN	A	184.168.221.15
 @	600	IN	A	184.168.221.14
 sub	600	IN	A	184.168.221.15
 ";
-            ClassicAssert.Throws<TokenException>(() => DnsZoneFile.Parse(str));
+            Assert.Throws<TokenException>(() => DnsZoneFile.Parse(str));
         }
 
 

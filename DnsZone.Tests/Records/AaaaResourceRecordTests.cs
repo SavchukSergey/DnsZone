@@ -18,9 +18,20 @@ namespace DnsZone.Tests.Records {
 $TTL 2d ; zone default = 2 days or 172800 seconds
 $ORIGIN example.com.
 example.com.  IN  AAAA  2001:db8:10::1        ; IPv6 address for example.com
-ns            IN  AAAA  2001:db8:10::2        ; IPv6 address for ns.example.com";
+ns            IN  AAAA  2001:db8:10::2        ; IPv6 address for ns.example.com
+joe        IN      AAAA      2001:db8::3  ; joe & www = same ip
+www        IN      AAAA      2001:db8::3
+; functionally the same as the record above
+www.example.com.   AAAA      2001:db8::3
+fred  3600 IN      AAAA      2001:db8::4  ; ttl =3600 overrides $TTL default
+ftp        IN      AAAA      2001:db8::5 ; round robin with next
+           IN      AAAA      2001:db8::6
+mail       IN      AAAA      2001:db8::7  ; mail = round robin
+mail       IN      AAAA      2001:db8::32
+mail       IN      AAAA      2001:db8::33
+squat      IN      AAAA      2001:db8:0:0:1::13  ; address in another subnet";
             var zone = DnsZoneFile.Parse(str);
-            ClassicAssert.AreEqual(2, zone.Records.Count);
+            Assert.That(zone.Records.Count, Is.EqualTo(12));
 
             ClassicAssert.IsAssignableFrom<AaaaResourceRecord>(zone.Records.First());
 
