@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace DnsZone.Tokens {
-    public class Tokenizer {
+    public static class Tokenizer {
 
         private static void SkipWhitespace(ref string content, ref int chIndex) {
             while (chIndex < content.Length) {
@@ -71,24 +72,24 @@ namespace DnsZone.Tokens {
             throw new TokenException("missing end quote", new Token { Position = position });
         }
 
-        private static string ReadCharacterString(ref string content, ref int chIndex) {
-            var token = "";
+        private static ReadOnlyMemory<char> ReadCharacterString(ref string content, ref int chIndex) {
+            var startIndex = chIndex;
             while (chIndex < content.Length) {
                 var ch = content[chIndex];
                 if (ch == '\r' || ch == '\n') {
-                    return token;
+                    return content.AsMemory(startIndex, chIndex - startIndex);
+                }
+                if (char.IsWhiteSpace(ch)) {
+                    var endIndex = chIndex;
+                    SkipWhitespace(ref content, ref chIndex);
+                    return content.AsMemory(startIndex, endIndex - startIndex);
                 }
                 chIndex++;
-                if (char.IsWhiteSpace(ch)) {
-                    SkipWhitespace(ref content, ref chIndex);
-                    return token;
-                }
-                token += ch;
             }
-            return token;
+            return content.AsMemory(startIndex);
         }
 
-        public IEnumerable<Token> Read(FileSource source) {
+        public static IEnumerable<Token> Read(FileSource source) {
             var content = source.Content;
             var pos = 0;
             var lineNumber = 1;
@@ -106,7 +107,7 @@ namespace DnsZone.Tokens {
                         yield return new Token {
                             Type = TokenType.Control,
                             Position = position,
-                            StringValue = ReadCharacterString(ref content, ref pos)
+                            StringValue = ReadCharacterString(ref content, ref pos).ToString()
                         };
                         break;
                     case '"':
@@ -158,7 +159,7 @@ namespace DnsZone.Tokens {
                             SkipWhitespace(ref content, ref pos);
                         } else {
                             yield return new Token {
-                                StringValue = ReadCharacterString(ref content, ref pos),
+                                StringValue = ReadCharacterString(ref content, ref pos).ToString(),
                                 Position = position,
                                 Type = TokenType.Literal
                             };

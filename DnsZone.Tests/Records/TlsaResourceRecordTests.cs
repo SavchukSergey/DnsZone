@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 using DnsZone.Records;
 using NUnit.Framework;
-using NUnit.Framework.Legacy;
 
 namespace DnsZone.Tests.Records {
     [TestFixture]
@@ -18,18 +17,18 @@ $TTL 2d ; zone default = 2 days or 172800 seconds
 $ORIGIN example.com.
 _443._tcp.keyserver.example.com. IN TLSA 3 1 1 e677073271638e936eb3846c7aacfd3d387b831aa953b7486dc8f6227798f70b";
             var zone = DnsZoneFile.Parse(str);
-            ClassicAssert.AreEqual(1, zone.Records.Count);
+            Assert.That(zone.Records.Count, Is.EqualTo(1));
 
-            ClassicAssert.IsAssignableFrom<TLSAResourceRecord>(zone.Records.First());
+            Assert.That(zone.Records.First(), Is.AssignableTo<TLSAResourceRecord>());
 
             var record = (TLSAResourceRecord)zone.Records.First();
-            ClassicAssert.AreEqual("_443._tcp.keyserver.example.com", record.Name);
-            ClassicAssert.AreEqual("IN", record.Class);
-            ClassicAssert.AreEqual(ResourceRecordType.TLSA, record.Type);
-            ClassicAssert.AreEqual(3, record.CertificateUsage);
-            ClassicAssert.AreEqual(1, record.Selector);
-            ClassicAssert.AreEqual(1, record.MatchingType);
-            ClassicAssert.AreEqual("e677073271638e936eb3846c7aacfd3d387b831aa953b7486dc8f6227798f70b", record.CertificateAssociationData);
+            Assert.That(record.Name, Is.EqualTo("_443._tcp.keyserver.example.com"));
+            Assert.That(record.Class, Is.EqualTo("IN"));
+            Assert.That(record.Type, Is.EqualTo(ResourceRecordType.TLSA));
+            Assert.That(record.CertificateUsage, Is.EqualTo(3));
+            Assert.That(record.Selector, Is.EqualTo(1));
+            Assert.That(record.MatchingType, Is.EqualTo(1));
+            Assert.That(record.CertificateAssociationData, Is.EqualTo("e677073271638e936eb3846c7aacfd3d387b831aa953b7486dc8f6227798f70b"));
         }
 
         [Test]
@@ -46,7 +45,7 @@ _443._tcp.keyserver.example.com. IN TLSA 3 1 1 e677073271638e936eb3846c7aacfd3d3
             };
             zone.Records.Add(record);
             var sOutput = zone.ToString();
-            ClassicAssert.AreEqual(";TLSA records\n_443._tcp.sil.example.com.\tIN\t\tTLSA\t3\t1\t2\tdd5f45b479cc19e697c33c676161df9e6466a9a728584b1c881e18222f9ada31\t\n\n", sOutput);
+            Assert.That(sOutput, Is.EqualTo(";TLSA records\n_443._tcp.sil.example.com.\tIN\t\tTLSA\t3\t1\t2\tdd5f45b479cc19e697c33c676161df9e6466a9a728584b1c881e18222f9ada31\t\n\n"));
         }
 
         [Test]
@@ -54,18 +53,18 @@ _443._tcp.keyserver.example.com. IN TLSA 3 1 1 e677073271638e936eb3846c7aacfd3d3
             var record = new TLSAResourceRecord {
                 Name = "_443._tcp.example.com"
             };
-            ClassicAssert.AreEqual(443, record.Port);
-            ClassicAssert.AreEqual("tcp", record.Protocol);
-            ClassicAssert.AreEqual("example.com", record.Host);
+            Assert.That(record.Port, Is.EqualTo(443));
+            Assert.That(record.Protocol, Is.EqualTo("tcp"));
+            Assert.That(record.Host, Is.EqualTo("example.com"));
 
             record.Port = 444;
-            ClassicAssert.AreEqual("_444._tcp.example.com", record.Name);
+            Assert.That(record.Name, Is.EqualTo("_444._tcp.example.com"));
 
             record.Protocol = "udp";
-            ClassicAssert.AreEqual("_444._udp.example.com", record.Name);
+            Assert.That(record.Name, Is.EqualTo("_444._udp.example.com"));
 
             record.Host = "vcap.me";
-            ClassicAssert.AreEqual("_444._udp.vcap.me", record.Name);
+            Assert.That(record.Name, Is.EqualTo("_444._udp.vcap.me"));
         }
     }
 }

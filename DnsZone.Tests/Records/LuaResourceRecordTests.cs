@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 using DnsZone.Records;
 using NUnit.Framework;
-using NUnit.Framework.Legacy;
 
 namespace DnsZone.Tests.Records {
     [TestFixture]
@@ -18,16 +17,16 @@ $TTL 2d ; zone default = 2 days or 172800 seconds
 $ORIGIN example.com.
 www IN	LUA A ""ifportup(443, {'192.0.2.1', '192.0.2.2'})""";
             var zone = DnsZoneFile.Parse(str);
-            ClassicAssert.AreEqual(1, zone.Records.Count);
+            Assert.That(zone.Records.Count, Is.EqualTo(1));
 
-            ClassicAssert.IsAssignableFrom<LuaResourceRecord>(zone.Records.First());
+            Assert.That(zone.Records.First(), Is.AssignableTo<LuaResourceRecord>());
 
             var record = (LuaResourceRecord)zone.Records.First();
-            ClassicAssert.AreEqual("www.example.com", record.Name);
-            ClassicAssert.AreEqual("IN", record.Class);
-            ClassicAssert.AreEqual(ResourceRecordType.LUA, record.Type);
-            ClassicAssert.AreEqual("A", record.TargetType);
-            ClassicAssert.AreEqual("ifportup(443, {'192.0.2.1', '192.0.2.2'})", record.Script);
+            Assert.That(record.Name, Is.EqualTo("www.example.com"));
+            Assert.That(record.Class, Is.EqualTo("IN"));
+            Assert.That(record.Type, Is.EqualTo(ResourceRecordType.LUA));
+            Assert.That(record.TargetType, Is.EqualTo("A"));
+            Assert.That(record.Script, Is.EqualTo("ifportup(443, {'192.0.2.1', '192.0.2.2'})"));
         }
         
         [Test]
@@ -43,7 +42,7 @@ www IN	LUA A ""ifportup(443, {'192.0.2.1', '192.0.2.2'})""";
             
             zone.Records.Add(record);
             var sOutput = zone.ToString();
-            ClassicAssert.AreEqual(";LUA records\nexample.com.\tIN\t\tLUA\tA\t\"ifportup(443, {'192.0.2.1', '192.0.2.2'})\"\t\n\n", sOutput);
+            Assert.That(sOutput, Is.EqualTo(";LUA records\nexample.com.\tIN\t\tLUA\tA\t\"ifportup(443, {'192.0.2.1', '192.0.2.2'})\"\t\n\n"));
         }
     }
 }

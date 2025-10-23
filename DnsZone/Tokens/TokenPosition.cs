@@ -1,15 +1,15 @@
 ﻿using System.Text;
 
 namespace DnsZone.Tokens {
-    public struct TokenPosition {
+    public readonly struct TokenPosition {
 
-        public int Line;
+        public required readonly int Line { get; init; }
 
-        public int LineStart;
+        public required readonly int LineStart { get; init; }
 
-        public FileSource File;
+        public required readonly FileSource File { get; init; }
 
-        public string GetLine() {
+        public readonly string GetLine() {
             var sb = new StringBuilder();
             for (var i = LineStart; i < File.Content.Length; i++) {
                 var ch = File.Content[i];

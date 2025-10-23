@@ -39,11 +39,10 @@ namespace DnsZone.Parser {
         public DnsZoneParseContext CreateChildContext(string fileName) {
             var newFile = Source.ResolveFile(fileName, FileName);
 
-            var tokenizer = new Tokenizer();
             var fileSource = new FileSource {
                 Content = Source.LoadContent(newFile)
             };
-            var tokens = tokenizer.Read(fileSource).ToArray();
+            var tokens = Tokenizer.Read(fileSource).ToArray();
             return new DnsZoneParseContext(tokens, Source) {
                 FileName = newFile
             };
@@ -113,7 +112,7 @@ namespace DnsZone.Parser {
                 }
                 return Origin;
             }
-            if (!val.EndsWith(".")) {
+			if (!val.EndsWith('.')) {
                 if (string.IsNullOrWhiteSpace(Origin)) {
                     throw new ArgumentException("couldn't resolve relative domain name");
                 }

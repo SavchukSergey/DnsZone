@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 using DnsZone.Records;
 using NUnit.Framework;
-using NUnit.Framework.Legacy;
 
 namespace DnsZone.Tests.Records {
     [TestFixture]
@@ -19,20 +18,20 @@ $ORIGIN example.com.
 service.example.com.  IN  NAPTR  100  10  ""A"" """"  """"  prodserver.example.com.
 new.example.com.  IN  NAPTR  100  10  ""A"" """"  ""!^.*$!prodserver.example.com!"".";
             var zone = DnsZoneFile.Parse(str);
-            ClassicAssert.AreEqual(2, zone.Records.Count);
+            Assert.That(zone.Records.Count, Is.EqualTo(2));
 
-            ClassicAssert.IsAssignableFrom<NaptrResourceRecord>(zone.Records.First());
+            Assert.That(zone.Records.First(), Is.AssignableTo<NaptrResourceRecord>());
 
             var record = (NaptrResourceRecord)zone.Records.First();
-            ClassicAssert.AreEqual("service.example.com", record.Name);
-            ClassicAssert.AreEqual("IN", record.Class);
-            ClassicAssert.AreEqual(ResourceRecordType.NAPTR, record.Type);
-            ClassicAssert.AreEqual(100, record.Order);
-            ClassicAssert.AreEqual(10, record.Preference);
-            ClassicAssert.AreEqual("A", record.Flags);
-            ClassicAssert.AreEqual("", record.Services);
-            ClassicAssert.AreEqual("", record.Regexp);
-            ClassicAssert.AreEqual("prodserver.example.com", record.Replacement);
+            Assert.That(record.Name, Is.EqualTo("service.example.com"));
+            Assert.That(record.Class, Is.EqualTo("IN"));
+            Assert.That(record.Type, Is.EqualTo(ResourceRecordType.NAPTR));
+            Assert.That(record.Order, Is.EqualTo(100));
+            Assert.That(record.Preference, Is.EqualTo(10));
+            Assert.That(record.Flags, Is.EqualTo("A"));
+            Assert.That(record.Services, Is.EqualTo(""));
+            Assert.That(record.Regexp, Is.EqualTo(""));
+            Assert.That(record.Replacement, Is.EqualTo("prodserver.example.com"));
         }
         
         [Test]
@@ -52,7 +51,7 @@ new.example.com.  IN  NAPTR  100  10  ""A"" """"  ""!^.*$!prodserver.example.com
             
             zone.Records.Add(record);
             var sOutput = zone.ToString();
-            ClassicAssert.AreEqual(";NAPTR records\nexample.com.\tIN\t\tNAPTR\t100\t10\t\"A\"\t\"\"\t\"\"\tprodserver.example.com\t\n\n", sOutput);
+            Assert.That(sOutput, Is.EqualTo(";NAPTR records\nexample.com.\tIN\t\tNAPTR\t100\t10\t\"A\"\t\"\"\t\"\"\tprodserver.example.com\t\n\n"));
         }
     }
 }

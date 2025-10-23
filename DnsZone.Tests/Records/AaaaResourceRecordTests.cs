@@ -2,7 +2,6 @@ using System.Linq;
 using System.Net;
 using DnsZone.Records;
 using NUnit.Framework;
-using NUnit.Framework.Legacy;
 
 namespace DnsZone.Tests.Records {
     [TestFixture]
@@ -33,13 +32,13 @@ squat      IN      AAAA      2001:db8:0:0:1::13  ; address in another subnet";
             var zone = DnsZoneFile.Parse(str);
             Assert.That(zone.Records.Count, Is.EqualTo(12));
 
-            ClassicAssert.IsAssignableFrom<AaaaResourceRecord>(zone.Records.First());
+            Assert.That(zone.Records.First(), Is.AssignableTo<AaaaResourceRecord>());
 
             var record = (AaaaResourceRecord)zone.Records.First();
-            ClassicAssert.AreEqual("example.com", record.Name);
-            ClassicAssert.AreEqual("IN", record.Class);
-            ClassicAssert.AreEqual(ResourceRecordType.AAAA, record.Type);
-            ClassicAssert.AreEqual(IPAddress.Parse("2001:db8:10::1"), record.Address);
+            Assert.That(record.Name, Is.EqualTo("example.com"));
+            Assert.That(record.Class, Is.EqualTo("IN"));
+            Assert.That(record.Type, Is.EqualTo(ResourceRecordType.AAAA));
+            Assert.That(record.Address, Is.EqualTo(IPAddress.Parse("2001:db8:10::1")));
         }
 
         [Test]
@@ -54,7 +53,7 @@ squat      IN      AAAA      2001:db8:0:0:1::13  ; address in another subnet";
 
             zone.Records.Add(record);
             var sOutput = zone.ToString();
-            ClassicAssert.AreEqual(";AAAA records\nexample.com.\tIN\t\tAAAA\t2001:db8:10::1\t\n\n", sOutput);
+            Assert.That(sOutput, Is.EqualTo(";AAAA records\nexample.com.\tIN\t\tAAAA\t2001:db8:10::1\t\n\n"));
         }
     }
 }

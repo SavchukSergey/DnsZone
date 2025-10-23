@@ -1,21 +1,22 @@
 ﻿namespace DnsZone.Tokens {
-    public struct Token {
+    public readonly struct Token {
 
-        public TokenPosition Position { get; set; }
+        public required readonly TokenPosition Position { get; init; }
 
-        public TokenType Type { get; set; }
+        public readonly TokenType Type { get; init; }
 
-        public string StringValue { get; set; }
+        public readonly string StringValue { get; init; }
 
-        public override string ToString() {
-            switch (Type) {
-                case TokenType.Control: return $"${StringValue}";
-                case TokenType.Literal: return StringValue;
-                case TokenType.NewLine: return "\\r\\n";
-                case TokenType.Comments: return StringValue;
-                case TokenType.Whitespace: return " ";
-            }
-            return StringValue;
+        public override readonly string ToString() {
+            return Type switch {
+                TokenType.Control => $"${StringValue}",
+                TokenType.Literal => StringValue,
+                TokenType.NewLine => "\\r\\n",
+                TokenType.Comments => StringValue,
+                TokenType.Whitespace => " ",
+                _ => StringValue,
+            };
+
         }
 
     }

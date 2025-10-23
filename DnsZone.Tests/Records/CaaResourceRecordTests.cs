@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 using DnsZone.Records;
 using NUnit.Framework;
-using NUnit.Framework.Legacy;
 
 namespace DnsZone.Tests.Records {
     [TestFixture]
@@ -19,17 +18,17 @@ $ORIGIN example.com.
 example.com. IN	CAA 0	iodef		""mailto: hostmaster@example.com""
     IN  CAA 0   issue       ""letsencrypt.org""";
             var zone = DnsZoneFile.Parse(str);
-            ClassicAssert.AreEqual(2, zone.Records.Count);
+            Assert.That(zone.Records.Count, Is.EqualTo(2));
 
-            ClassicAssert.IsAssignableFrom<CAAResourceRecord>(zone.Records.First());
+            Assert.That(zone.Records.First(), Is.AssignableTo<CAAResourceRecord>());
 
             var record = (CAAResourceRecord)zone.Records.First();
-            ClassicAssert.AreEqual("example.com", record.Name);
-            ClassicAssert.AreEqual("IN", record.Class);
-            ClassicAssert.AreEqual(ResourceRecordType.CAA, record.Type);
-            ClassicAssert.AreEqual(0, record.Flag);
-            ClassicAssert.AreEqual("iodef", record.Tag);
-            ClassicAssert.AreEqual("mailto: hostmaster@example.com", record.Value);
+            Assert.That(record.Name, Is.EqualTo("example.com"));
+            Assert.That(record.Class, Is.EqualTo("IN"));
+            Assert.That(record.Type, Is.EqualTo(ResourceRecordType.CAA));
+            Assert.That(record.Flag, Is.EqualTo(0));
+            Assert.That(record.Tag, Is.EqualTo("iodef"));
+            Assert.That(record.Value, Is.EqualTo("mailto: hostmaster@example.com"));
         }
         
         [Test]
@@ -46,7 +45,7 @@ example.com. IN	CAA 0	iodef		""mailto: hostmaster@example.com""
 
             zone.Records.Add(record);
             var sOutput = zone.ToString();
-            ClassicAssert.AreEqual(";CAA records\nexample.com.\tIN\t\tCAA\t0\tiodef\t\"letsencrypt.org\"\t\n\n", sOutput);
+            Assert.That(sOutput, Is.EqualTo(";CAA records\nexample.com.\tIN\t\tCAA\t0\tiodef\t\"letsencrypt.org\"\t\n\n"));
         }
 
     }

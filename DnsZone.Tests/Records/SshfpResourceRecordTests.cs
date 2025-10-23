@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 using DnsZone.Records;
 using NUnit.Framework;
-using NUnit.Framework.Legacy;
 
 namespace DnsZone.Tests.Records {
     [TestFixture]
@@ -18,17 +17,17 @@ $TTL 2d ; zone default = 2 days or 172800 seconds
 $ORIGIN example.com.
 sil.example.com. IN SSHFP 2 1 450c7d19d5da9a3a5b7c18992d1fbde15d8dad34";
             var zone = DnsZoneFile.Parse(str);
-            ClassicAssert.AreEqual(1, zone.Records.Count);
+            Assert.That(zone.Records.Count, Is.EqualTo(1));
 
-            ClassicAssert.IsAssignableFrom<SSHFPResourceRecord>(zone.Records.First());
+            Assert.That(zone.Records.First(), Is.AssignableTo<SSHFPResourceRecord>());
 
             var record = (SSHFPResourceRecord)zone.Records.First();
-            ClassicAssert.AreEqual("sil.example.com", record.Name);
-            ClassicAssert.AreEqual("IN", record.Class);
-            ClassicAssert.AreEqual(ResourceRecordType.SSHFP, record.Type);
-            ClassicAssert.AreEqual(2, record.AlgorithmNumber);
-            ClassicAssert.AreEqual(1, record.FingerprintType);
-            ClassicAssert.AreEqual("450c7d19d5da9a3a5b7c18992d1fbde15d8dad34", record.Fingerprint);
+            Assert.That(record.Name, Is.EqualTo("sil.example.com"));
+            Assert.That(record.Class, Is.EqualTo("IN"));
+            Assert.That(record.Type, Is.EqualTo(ResourceRecordType.SSHFP));
+            Assert.That(record.AlgorithmNumber, Is.EqualTo(2));
+            Assert.That(record.FingerprintType, Is.EqualTo(1));
+            Assert.That(record.Fingerprint, Is.EqualTo("450c7d19d5da9a3a5b7c18992d1fbde15d8dad34"));
         }
 
         [Test]
@@ -44,7 +43,7 @@ sil.example.com. IN SSHFP 2 1 450c7d19d5da9a3a5b7c18992d1fbde15d8dad34";
             };
             zone.Records.Add(record);
             var sOutput = zone.ToString();
-            ClassicAssert.AreEqual(";SSHFP records\nsil.example.com.\tIN\t\tSSHFP\t3\t1\t450c7d19d5da9a3a5b7c19992d1fbde15d8dad34\t\n\n", sOutput);
+            Assert.That(sOutput, Is.EqualTo(";SSHFP records\nsil.example.com.\tIN\t\tSSHFP\t3\t1\t450c7d19d5da9a3a5b7c19992d1fbde15d8dad34\t\n\n"));
         }
     }
 }

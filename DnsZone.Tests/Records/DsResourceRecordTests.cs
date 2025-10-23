@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 using DnsZone.Records;
 using NUnit.Framework;
-using NUnit.Framework.Legacy;
 
 namespace DnsZone.Tests.Records {
     [TestFixture]
@@ -18,18 +17,18 @@ $TTL 2d ; zone default = 2 days or 172800 seconds
 $ORIGIN example.com.
 example.com.        IN DS 62910 7 1 1D6AC75083F3CEC31861993E325E0EEC7E97D1DD";
             var zone = DnsZoneFile.Parse(str);
-            ClassicAssert.AreEqual(1, zone.Records.Count);
+            Assert.That(zone.Records.Count, Is.EqualTo(1));
 
-            ClassicAssert.IsAssignableFrom<DsResourceRecord>(zone.Records.First());
+            Assert.That(zone.Records.First(), Is.AssignableTo<DsResourceRecord>());
 
             var record = (DsResourceRecord)zone.Records.First();
-            ClassicAssert.AreEqual("example.com", record.Name);
-            ClassicAssert.AreEqual("IN", record.Class);
-            ClassicAssert.AreEqual(ResourceRecordType.DS, record.Type);
-            ClassicAssert.AreEqual("62910", record.KeyTag);
-            ClassicAssert.AreEqual(7, record.Algorithm);
-            ClassicAssert.AreEqual(1, record.HashType);
-            ClassicAssert.AreEqual("1D6AC75083F3CEC31861993E325E0EEC7E97D1DD", record.Hash);
+            Assert.That(record.Name, Is.EqualTo("example.com"));
+            Assert.That(record.Class, Is.EqualTo("IN"));
+            Assert.That(record.Type, Is.EqualTo(ResourceRecordType.DS));
+            Assert.That(record.KeyTag, Is.EqualTo("62910"));
+            Assert.That(record.Algorithm, Is.EqualTo(7));
+            Assert.That(record.HashType, Is.EqualTo(1));
+            Assert.That(record.Hash, Is.EqualTo("1D6AC75083F3CEC31861993E325E0EEC7E97D1DD"));
         }
         
         [Test]
@@ -47,7 +46,7 @@ example.com.        IN DS 62910 7 1 1D6AC75083F3CEC31861993E325E0EEC7E97D1DD";
             
             zone.Records.Add(record);
             var sOutput = zone.ToString();
-            ClassicAssert.AreEqual(";DS records\nexample.com.\tIN\t\tDS\t52037\t1\t1\t378929E92D7DA04267EE87E802D75C5CA1B5D280\t\n\n", sOutput);
+            Assert.That(sOutput, Is.EqualTo(";DS records\nexample.com.\tIN\t\tDS\t52037\t1\t1\t378929E92D7DA04267EE87E802D75C5CA1B5D280\t\n\n"));
         }
     }
 }

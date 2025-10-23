@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 using DnsZone.Records;
 using NUnit.Framework;
-using NUnit.Framework.Legacy;
 
 namespace DnsZone.Tests.Records {
     [TestFixture]
@@ -22,15 +21,15 @@ joe IN      TXT (""Located in a black hole""
 ; generates a single text string of
 ; Located in a black hole somewhere over the rainbow";
             var zone = DnsZoneFile.Parse(str);
-            ClassicAssert.AreEqual(2, zone.Records.Count);
+            Assert.That(zone.Records.Count, Is.EqualTo(2));
 
-            ClassicAssert.IsAssignableFrom<TxtResourceRecord>(zone.Records.First());
+            Assert.That(zone.Records.First(), Is.AssignableTo<TxtResourceRecord>());
 
             var record = (TxtResourceRecord)zone.Records.First();
-            ClassicAssert.AreEqual("joe.example.com", record.Name);
-            ClassicAssert.AreEqual("IN", record.Class);
-            ClassicAssert.AreEqual(ResourceRecordType.TXT, record.Type);
-            ClassicAssert.AreEqual("Located in a black hole somewhere", record.Content);
+            Assert.That(record.Name, Is.EqualTo("joe.example.com"));
+            Assert.That(record.Class, Is.EqualTo("IN"));
+            Assert.That(record.Type, Is.EqualTo(ResourceRecordType.TXT));
+            Assert.That(record.Content, Is.EqualTo("Located in a black hole somewhere"));
         }
 
         [Test]
@@ -48,15 +47,15 @@ joe IN      TXT (""Located in a black hole""
 ; generates a single text string of
 ; Located in a black hole somewhere over the rainbow";
             var zone = DnsZoneFile.Parse(str);
-            ClassicAssert.That(zone.Records.Count, Is.EqualTo(2));
+            Assert.That(zone.Records.Count, Is.EqualTo(2));
 
-            ClassicAssert.IsAssignableFrom<TxtResourceRecord>(zone.Records.First());
+            Assert.That(zone.Records.First(), Is.AssignableTo<TxtResourceRecord>());
 
             var record = (TxtResourceRecord)zone.Records.First();
-            ClassicAssert.That(record.Name, Is.EqualTo("joe.example.com"));
-            ClassicAssert.That(record.Class, Is.EqualTo("IN"));
-            ClassicAssert.That(record.Type, Is.EqualTo(ResourceRecordType.TXT));
-            ClassicAssert.That(record.Content, Is.EqualTo("LocatedInABlackHole"));
+            Assert.That(record.Name, Is.EqualTo("joe.example.com"));
+            Assert.That(record.Class, Is.EqualTo("IN"));
+            Assert.That(record.Type, Is.EqualTo(ResourceRecordType.TXT));
+            Assert.That(record.Content, Is.EqualTo("LocatedInABlackHole"));
         }
 
     }

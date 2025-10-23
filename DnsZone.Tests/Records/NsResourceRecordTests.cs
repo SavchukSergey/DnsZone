@@ -1,10 +1,8 @@
 ﻿using System.Linq;
 using DnsZone.Records;
 using NUnit.Framework;
-using NUnit.Framework.Legacy;
 
-namespace DnsZone.Tests.Records
-{
+namespace DnsZone.Tests.Records {
     [TestFixture]
     public class NsResourceRecordTests {
 
@@ -20,15 +18,15 @@ $ORIGIN example.com.
 @               IN      NS     ns1.example.net.
 @               IN      NS     ns1.example.org.";
             var zone = DnsZoneFile.Parse(str);
-            ClassicAssert.AreEqual(2, zone.Records.Count);
+            Assert.That(zone.Records.Count, Is.EqualTo(2));
 
-            ClassicAssert.IsAssignableFrom<NsResourceRecord>(zone.Records.First());
+            Assert.That(zone.Records.First(), Is.AssignableTo<NsResourceRecord>());
 
             var record = (NsResourceRecord)zone.Records.First();
-            ClassicAssert.AreEqual("example.com", record.Name);
-            ClassicAssert.AreEqual("IN", record.Class);
-            ClassicAssert.AreEqual(ResourceRecordType.NS, record.Type);
-            ClassicAssert.AreEqual("ns1.example.net", record.NameServer);
+            Assert.That(record.Name, Is.EqualTo("example.com"));
+            Assert.That(record.Class, Is.EqualTo("IN"));
+            Assert.That(record.Type, Is.EqualTo(ResourceRecordType.NS));
+            Assert.That(record.NameServer, Is.EqualTo("ns1.example.net"));
         }
 
     }

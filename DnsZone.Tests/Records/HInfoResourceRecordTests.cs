@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 using DnsZone.Records;
 using NUnit.Framework;
-using NUnit.Framework.Legacy;
 
 namespace DnsZone.Tests.Records {
     [TestFixture]
@@ -18,16 +17,16 @@ $TTL 2d ; zone default = 2 days or 172800 seconds
 $ORIGIN example.com.
 example.com. IN HINFO ""INTEL-386"" ""Windows""";
             var zone = DnsZoneFile.Parse(str);
-            ClassicAssert.AreEqual(1, zone.Records.Count);
+            Assert.That(zone.Records.Count, Is.EqualTo(1));
 
-            ClassicAssert.IsAssignableFrom<HInfoResourceRecord>(zone.Records.First());
+            Assert.That(zone.Records.First(), Is.AssignableTo<HInfoResourceRecord>());
 
             var record = (HInfoResourceRecord)zone.Records.First();
-            ClassicAssert.AreEqual("example.com", record.Name);
-            ClassicAssert.AreEqual("IN", record.Class);
-            ClassicAssert.AreEqual(ResourceRecordType.HINFO, record.Type);
-            ClassicAssert.AreEqual("INTEL-386", record.Cpu);
-            ClassicAssert.AreEqual("Windows", record.Os);
+            Assert.That(record.Name, Is.EqualTo("example.com"));
+            Assert.That(record.Class, Is.EqualTo("IN"));
+            Assert.That(record.Type, Is.EqualTo(ResourceRecordType.HINFO));
+            Assert.That(record.Cpu, Is.EqualTo("INTEL-386"));
+            Assert.That(record.Os, Is.EqualTo("Windows"));
         }
         
         [Test]
@@ -43,7 +42,7 @@ example.com. IN HINFO ""INTEL-386"" ""Windows""";
             
             zone.Records.Add(record);
             var sOutput = zone.ToString();
-            ClassicAssert.AreEqual(";HINFO records\nexample.com.\tIN\t\tHINFO\t\"INTEL-386\"\t\"Windows\"\t\n\n", sOutput);
+            Assert.That(sOutput, Is.EqualTo(";HINFO records\nexample.com.\tIN\t\tHINFO\t\"INTEL-386\"\t\"Windows\"\t\n\n"));
         }
     }
 }

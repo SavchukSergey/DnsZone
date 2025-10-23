@@ -86,11 +86,10 @@ namespace DnsZone {
         /// <param name="origin">Explicit origin if needed</param>
         /// <returns></returns>
         public static DnsZoneFile Parse(IDnsSource source, string origin = null) {
-            var tokenizer = new Tokenizer();
             var fileSource = new FileSource {
                 Content = source.LoadContent(null)
             };
-            var tokens = tokenizer.Read(fileSource).ToArray();
+            var tokens = Tokenizer.Read(fileSource).ToArray();
             var context = new DnsZoneParseContext(tokens, source) {
                 Origin = origin
             };

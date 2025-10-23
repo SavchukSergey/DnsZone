@@ -6,7 +6,7 @@ using DnsZone.Records;
 namespace DnsZone.Formatter {
     public class DnsZoneFormatterContext {
 
-        private const string TAB_CHAR = "\t";
+		private const char TAB_CHAR = '\t';
 
         public string Origin { get; set; }
 
@@ -94,7 +94,7 @@ namespace DnsZone.Formatter {
             }
             var relativeSuffix = "." + Origin;
             if (Origin != null && val.EndsWith(relativeSuffix)) {
-                return val.Substring(0, val.Length - relativeSuffix.Length);
+				return val[..^relativeSuffix.Length];
             }
             return val + ".";
         }

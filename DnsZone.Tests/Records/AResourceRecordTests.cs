@@ -2,7 +2,6 @@ using System.Linq;
 using System.Net;
 using DnsZone.Records;
 using NUnit.Framework;
-using NUnit.Framework.Legacy;
 
 namespace DnsZone.Tests.Records {
     [TestFixture]
@@ -21,15 +20,15 @@ mail          IN  A     192.0.2.3             ; IPv4 address for mail.example.co
 mail2         IN  A     192.0.2.4             ; IPv4 address for mail2.example.com
 mail3         IN  A     192.0.2.5             ; IPv4 address for mail3.example.com";
             var zone = DnsZoneFile.Parse(str);
-            ClassicAssert.AreEqual(3, zone.Records.Count);
+            Assert.That(zone.Records.Count, Is.EqualTo(3));
 
-            ClassicAssert.IsAssignableFrom<AResourceRecord>(zone.Records.First());
+            Assert.That(zone.Records.First(), Is.AssignableTo<AResourceRecord>());
 
             var record = (AResourceRecord)zone.Records.First();
-            ClassicAssert.AreEqual("mail.example.com", record.Name);
-            ClassicAssert.AreEqual("IN", record.Class);
-            ClassicAssert.AreEqual(ResourceRecordType.A, record.Type);
-            ClassicAssert.AreEqual(IPAddress.Parse("192.0.2.3"), record.Address);
+            Assert.That(record.Name, Is.EqualTo("mail.example.com"));
+            Assert.That(record.Class, Is.EqualTo("IN"));
+            Assert.That(record.Type, Is.EqualTo(ResourceRecordType.A));
+            Assert.That(record.Address, Is.EqualTo(IPAddress.Parse("192.0.2.3")));
         }
 
         [Test]
@@ -44,7 +43,7 @@ mail3         IN  A     192.0.2.5             ; IPv4 address for mail3.example.c
 
             zone.Records.Add(record);
             var sOutput = zone.ToString();
-            ClassicAssert.AreEqual(";A records\nexample.com.\tIN\t\tA\t192.0.2.3\t\n\n", sOutput);
+            Assert.That(sOutput, Is.EqualTo(";A records\nexample.com.\tIN\t\tA\t192.0.2.3\t\n\n"));
         }
     }
 }
