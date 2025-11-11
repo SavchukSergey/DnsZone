@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -14,7 +14,7 @@ namespace DnsZone.Parser {
         protected string FileName { get; set; }
 
 
-        public string Origin { get; set; }
+        public string? Origin { get; set; }
 
         public TimeSpan? DefaultTtl { get; set; }
 
@@ -112,7 +112,7 @@ namespace DnsZone.Parser {
                 }
                 return Origin;
             }
-			if (!val.EndsWith('.')) {
+            if (!val.EndsWith('.')) {
                 if (string.IsNullOrWhiteSpace(Origin)) {
                     throw new ArgumentException("couldn't resolve relative domain name");
                 }

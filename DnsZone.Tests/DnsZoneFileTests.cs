@@ -165,7 +165,14 @@ sub	600	IN	A	184.168.221.15
                 Ttl = TimeSpan.FromMinutes(15),
                 Address = IPAddress.Parse("127.0.0.1")
             });
-            Assert.That(zone.ToString(), Is.Not.Null);
+            var val = zone.ToString(origin: null, defaultTtl: TimeSpan.FromSeconds(5));
+            var TAB_CHAR = '\t';
+            Assert.That(val, Is.EqualTo($@"$TTL 5
+;A records
+www.example.com.{TAB_CHAR}IN{TAB_CHAR}15m{TAB_CHAR}A{TAB_CHAR}127.0.0.1
+ftp.example.com.{TAB_CHAR}IN{TAB_CHAR}15m{TAB_CHAR}A{TAB_CHAR}127.0.0.1
+
+"));
         }
 
         [Test]

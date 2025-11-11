@@ -43,7 +43,7 @@ mail3         IN  A     192.0.2.5             ; IPv4 address for mail3.example.c
 
             zone.Records.Add(record);
             var sOutput = zone.ToString();
-            Assert.That(sOutput, Is.EqualTo(";A records\nexample.com.\tIN\t\tA\t192.0.2.3\t\n\n"));
+            Assert.That(sOutput, Is.EqualTo(";A records\nexample.com.\tIN\t\tA\t192.0.2.3\n\n"));
         }
     }
 }

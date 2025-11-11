@@ -14,9 +14,9 @@ using System.Net.Http;
 namespace DnsZone {
     public class DnsZoneFile {
 
-        private static readonly ResourceRecordReader _reader = new ResourceRecordReader();
+        private static readonly ResourceRecordReader _reader = new();
 
-        public IList<ResourceRecord> Records { get; } = new List<ResourceRecord>();
+        public IList<ResourceRecord> Records { get; } = [];
 
         public DnsZoneFile Filter(string origin) {
             var res = new DnsZoneFile();
@@ -45,7 +45,7 @@ namespace DnsZone {
             return ToString(null);
         }
 
-        public string ToString(string origin) {
+        public string ToString(string? origin = null, TimeSpan? defaultTtl = null) {
             var sb = new StringBuilder();
             var context = new DnsZoneFormatterContext(this, sb) {
                 Origin = origin
@@ -53,13 +53,16 @@ namespace DnsZone {
             if (!string.IsNullOrWhiteSpace(origin)) {
                 context.WriteOrigin(origin);
             }
+            if (defaultTtl.HasValue) {
+                context.WriteTtl(defaultTtl.Value);
+            }
             var writer = new ResourceRecordWriter();
             foreach (var recordGroup in Records.GroupBy(item => item.Type)) {
                 context.AppendLine($";{recordGroup.Key} records");
                 foreach (var record in recordGroup) {
                     context.WriteAndCompressDomainName(record.Name);
                     context.WriteClass(record.Class);
-                    context.WriteTimeSpan(record.Ttl);
+                    context.WriteTimeSpanTab(record.Ttl);
                     context.WriteResourceRecordType(record.Type);
                     record.AcceptVistor(writer, context);
                     context.AppendLine();
@@ -75,7 +78,7 @@ namespace DnsZone {
         /// <param name="content">DNS zone file content</param>
         /// <param name="origin">Explicit origin if needed</param>
         /// <returns></returns>
-        public static DnsZoneFile Parse(string content, string origin = null) {
+        public static DnsZoneFile Parse(string content, string? origin = null) {
             return Parse(new StringDnsSource(content), origin);
         }
 
@@ -85,7 +88,7 @@ namespace DnsZone {
         /// <param name="source">DNS zone file source</param>
         /// <param name="origin">Explicit origin if needed</param>
         /// <returns></returns>
-        public static DnsZoneFile Parse(IDnsSource source, string origin = null) {
+        public static DnsZoneFile Parse(IDnsSource source, string? origin = null) {
             var fileSource = new FileSource {
                 Content = source.LoadContent(null)
             };
@@ -151,14 +154,14 @@ namespace DnsZone {
         }
 
         private static void ParseResourceRecord(DnsZoneParseContext context) {
-            string @class = null;
+            string? @class = null;
             TimeSpan? ttl = null;
 
             if (context.Tokens.Count == 0) {
                 return;
             }
 
-            string name = null;
+            string? name = null;
             var nameToken = context.Tokens.Dequeue();
             if (nameToken.Type == TokenType.Literal) {
                 name = nameToken.StringValue;
@@ -226,20 +229,17 @@ namespace DnsZone {
 
         }
 
-        public static async Task<DnsZoneFile> LoadFromUriAsync(string uri, string explicitOrigin = null) {
-            using (var client = new HttpClient()) {
-                var content = await client.GetStringAsync(uri);
-                return Parse(content, explicitOrigin);
-            }
+        public static async Task<DnsZoneFile> LoadFromUriAsync(string uri, string? explicitOrigin = null) {
+            using var client = new HttpClient();
+            var content = await client.GetStringAsync(uri);
+            return Parse(content, explicitOrigin);
         }
 
-        public static async Task<DnsZoneFile> LoadFromFileAsync(string path, string explicitOrigin = null) {
-            using (var file = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) {
-                using (var reader = new StreamReader(file)) {
-                    var content = await reader.ReadToEndAsync();
-                    return Parse(content, explicitOrigin);
-                }
-            }
+        public static async Task<DnsZoneFile> LoadFromFileAsync(string path, string? explicitOrigin = null) {
+            using var file = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            using var reader = new StreamReader(file);
+            var content = await reader.ReadToEndAsync();
+            return Parse(content, explicitOrigin);
         }
 
     }

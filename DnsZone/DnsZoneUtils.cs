@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using DnsZone.Records;
 
@@ -6,103 +7,103 @@ namespace DnsZone {
     public static class DnsZoneUtils {
 
         public static ResourceRecordType ParseResourceRecordType(string val) {
-            switch (val.ToUpperInvariant()) {
-                case "A": return ResourceRecordType.A;
-                case "AAAA": return ResourceRecordType.AAAA;
-                case "NS": return ResourceRecordType.NS;
-                case "MD": return ResourceRecordType.MD;
-                case "MF": return ResourceRecordType.MF;
-                case "CNAME": return ResourceRecordType.CNAME;
-                case "SOA": return ResourceRecordType.SOA;
-                case "MB": return ResourceRecordType.MB;
-                case "MG": return ResourceRecordType.MG;
-                case "MR": return ResourceRecordType.MR;
-                case "NULL": return ResourceRecordType.NULL;
-                case "WKS": return ResourceRecordType.WKS;
-                case "PTR": return ResourceRecordType.PTR;
-                case "SRV": return ResourceRecordType.SRV;
-                case "SSHFP": return ResourceRecordType.SSHFP;
-                case "HINFO": return ResourceRecordType.HINFO;
-                case "MX": return ResourceRecordType.MX;
-                case "TXT": return ResourceRecordType.TXT;
-                case "CAA": return ResourceRecordType.CAA;
-                case "TLSA": return ResourceRecordType.TLSA;
-                case "ALIAS": return ResourceRecordType.ALIAS;
-                case "DNAME": return ResourceRecordType.DNAME;
-                case "DS": return ResourceRecordType.DS;
-                case "LUA": return ResourceRecordType.LUA;
-                case "NAPTR": return ResourceRecordType.NAPTR;
-                default:
-                    throw new NotSupportedException($"unsupported resource record type {val}");
-            }
+            return val.ToUpperInvariant() switch {
+                "A" => ResourceRecordType.A,
+                "AAAA" => ResourceRecordType.AAAA,
+                "NS" => ResourceRecordType.NS,
+                "MD" => ResourceRecordType.MD,
+                "MF" => ResourceRecordType.MF,
+                "CNAME" => ResourceRecordType.CNAME,
+                "SOA" => ResourceRecordType.SOA,
+                "MB" => ResourceRecordType.MB,
+                "MG" => ResourceRecordType.MG,
+                "MR" => ResourceRecordType.MR,
+                "NULL" => ResourceRecordType.NULL,
+                "WKS" => ResourceRecordType.WKS,
+                "PTR" => ResourceRecordType.PTR,
+                "SRV" => ResourceRecordType.SRV,
+                "SSHFP" => ResourceRecordType.SSHFP,
+                "HINFO" => ResourceRecordType.HINFO,
+                "MX" => ResourceRecordType.MX,
+                "TXT" => ResourceRecordType.TXT,
+                "CAA" => ResourceRecordType.CAA,
+                "TLSA" => ResourceRecordType.TLSA,
+                "ALIAS" => ResourceRecordType.ALIAS,
+                "DNAME" => ResourceRecordType.DNAME,
+                "DS" => ResourceRecordType.DS,
+                "LUA" => ResourceRecordType.LUA,
+                "NAPTR" => ResourceRecordType.NAPTR,
+                _ => throw new NotSupportedException($"unsupported resource record type {val}"),
+            };
+
         }
 
         public static string FormatResourceRecordType(ResourceRecordType val) {
-            switch (val) {
-                case ResourceRecordType.A: return "A";
-                case ResourceRecordType.AAAA: return "AAAA";
-                case ResourceRecordType.NS: return "NS";
-                case ResourceRecordType.MD: return "MD";
-                case ResourceRecordType.MF: return "MF";
-                case ResourceRecordType.CNAME: return "CNAME";
-                case ResourceRecordType.SOA: return "SOA";
-                case ResourceRecordType.MB: return "MB";
-                case ResourceRecordType.MG: return "MG";
-                case ResourceRecordType.MR: return "MR";
-                case ResourceRecordType.NULL: return "NULL";
-                case ResourceRecordType.WKS: return "WKS";
-                case ResourceRecordType.PTR: return "PTR";
-                case ResourceRecordType.SRV: return "SRV";
-                case ResourceRecordType.HINFO: return "HINFO";
-                case ResourceRecordType.MX: return "MX";
-                case ResourceRecordType.TXT: return "TXT";
-                case ResourceRecordType.CAA: return "CAA";
-                case ResourceRecordType.TLSA: return "TLSA";
-                case ResourceRecordType.SSHFP: return "SSHFP";
-                case ResourceRecordType.ALIAS: return "ALIAS";
-                case ResourceRecordType.DNAME: return "DNAME";
-                case ResourceRecordType.DS: return "DS";
-                case ResourceRecordType.LUA: return "LUA";
-                case ResourceRecordType.NAPTR: return "NAPTR";
-                default:
-                    throw new NotSupportedException($"unsupported resource record type {val}");
-            }
+            return val switch {
+                ResourceRecordType.A => "A",
+                ResourceRecordType.AAAA => "AAAA",
+                ResourceRecordType.NS => "NS",
+                ResourceRecordType.MD => "MD",
+                ResourceRecordType.MF => "MF",
+                ResourceRecordType.CNAME => "CNAME",
+                ResourceRecordType.SOA => "SOA",
+                ResourceRecordType.MB => "MB",
+                ResourceRecordType.MG => "MG",
+                ResourceRecordType.MR => "MR",
+                ResourceRecordType.NULL => "NULL",
+                ResourceRecordType.WKS => "WKS",
+                ResourceRecordType.PTR => "PTR",
+                ResourceRecordType.SRV => "SRV",
+                ResourceRecordType.HINFO => "HINFO",
+                ResourceRecordType.MX => "MX",
+                ResourceRecordType.TXT => "TXT",
+                ResourceRecordType.CAA => "CAA",
+                ResourceRecordType.TLSA => "TLSA",
+                ResourceRecordType.SSHFP => "SSHFP",
+                ResourceRecordType.ALIAS => "ALIAS",
+                ResourceRecordType.DNAME => "DNAME",
+                ResourceRecordType.DS => "DS",
+                ResourceRecordType.LUA => "LUA",
+                ResourceRecordType.NAPTR => "NAPTR",
+                _ => throw new NotSupportedException($"unsupported resource record type {val}"),
+            };
+
         }
 
 
         public static ResourceRecord CreateRecord(ResourceRecordType type) {
-            switch (type) {
-                case ResourceRecordType.A: return new AResourceRecord();
-                case ResourceRecordType.AAAA: return new AaaaResourceRecord();
-                case ResourceRecordType.NS: return new NsResourceRecord();
+            return type switch {
+                ResourceRecordType.A => new AResourceRecord(),
+                ResourceRecordType.AAAA => new AaaaResourceRecord(),
+                ResourceRecordType.NS => new NsResourceRecord(),
                 //case ResourceRecordType.MD: return ResourceRecordType.MD;
                 //case ResourceRecordType.MF: return ResourceRecordType.MF;
-                case ResourceRecordType.CNAME: return new CNameResourceRecord();
-                case ResourceRecordType.SOA: return new SoaResourceRecord();
+                ResourceRecordType.CNAME => new CNameResourceRecord(),
+                ResourceRecordType.SOA => new SoaResourceRecord(),
                 //case ResourceRecordType.MB: return ResourceRecordType.MB;
                 //case ResourceRecordType.MG: return ResourceRecordType.MG;
                 //case ResourceRecordType.MR: return ResourceRecordType.MR;
                 //case ResourceRecordType.NULL: return ResourceRecordType.NULL;
                 //case ResourceRecordType.WKS: return ResourceRecordType.WKS;
-                case ResourceRecordType.PTR: return new PtrResourceRecord();
-                case ResourceRecordType.SRV: return new SrvResourceRecord();
-                case ResourceRecordType.HINFO: return new HInfoResourceRecord();
-                case ResourceRecordType.MX: return new MxResourceRecord();
-                case ResourceRecordType.TXT: return new TxtResourceRecord();
-                case ResourceRecordType.CAA: return new CAAResourceRecord();
-                case ResourceRecordType.TLSA: return new TLSAResourceRecord();
-                case ResourceRecordType.SSHFP: return new SSHFPResourceRecord();
-                case ResourceRecordType.ALIAS: return new AliasResourceRecord();
-                case ResourceRecordType.DNAME: return new DNameResourceRecord();
-                case ResourceRecordType.DS: return new DsResourceRecord();
-                case ResourceRecordType.LUA: return new LuaResourceRecord();
-                case ResourceRecordType.NAPTR: return new NaptrResourceRecord();
-                default:
-                    throw new NotSupportedException($"unsupported resource record type {type}");
-            }
+                ResourceRecordType.PTR => new PtrResourceRecord(),
+                ResourceRecordType.SRV => new SrvResourceRecord(),
+                ResourceRecordType.HINFO => new HInfoResourceRecord(),
+                ResourceRecordType.MX => new MxResourceRecord(),
+                ResourceRecordType.TXT => new TxtResourceRecord(),
+                ResourceRecordType.CAA => new CAAResourceRecord(),
+                ResourceRecordType.TLSA => new TLSAResourceRecord(),
+                ResourceRecordType.SSHFP => new SSHFPResourceRecord(),
+                ResourceRecordType.ALIAS => new AliasResourceRecord(),
+                ResourceRecordType.DNAME => new DNameResourceRecord(),
+                ResourceRecordType.DS => new DsResourceRecord(),
+                ResourceRecordType.LUA => new LuaResourceRecord(),
+                ResourceRecordType.NAPTR => new NaptrResourceRecord(),
+                _ => throw new NotSupportedException($"unsupported resource record type {type}"),
+            };
+
         }
 
-        public static bool TryParseClass(string val, out string @class) {
+        public static bool TryParseClass(string val, [NotNullWhen(true)] out string? @class) {
             @class = null;
             switch (val.ToUpperInvariant()) {
                 case "IN":
@@ -131,25 +132,15 @@ namespace DnsZone {
                     part = (part ?? 0) * 10 + (ch - '0');
                 } else {
                     if (part == null) throw new FormatException("timespan value expected");
-                    switch (char.ToLowerInvariant(ch)) {
-                        case 'w':
-                            res += TimeSpan.FromDays(part.Value * 7);
-                            break;
-                        case 'd':
-                            res += TimeSpan.FromDays(part.Value);
-                            break;
-                        case 'h':
-                            res += TimeSpan.FromHours(part.Value);
-                            break;
-                        case 'm':
-                            res += TimeSpan.FromMinutes(part.Value);
-                            break;
-                        case 's':
-                            res += TimeSpan.FromSeconds(part.Value);
-                            break;
-                        default:
-                            throw new NotSupportedException($"timespan unit {ch} is not supported");
-                    }
+                    res += char.ToLowerInvariant(ch) switch {
+                        'w' => TimeSpan.FromDays(part.Value * 7),
+                        'd' => TimeSpan.FromDays(part.Value),
+                        'h' => TimeSpan.FromHours(part.Value),
+                        'm' => TimeSpan.FromMinutes(part.Value),
+                        's' => TimeSpan.FromSeconds(part.Value),
+                        _ => throw new NotSupportedException($"timespan unit {ch} is not supported"),
+                    };
+
                     part = null;
                 }
             }

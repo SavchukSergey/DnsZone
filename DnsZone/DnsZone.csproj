@@ -1,13 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
-    <Version>2.0.0</Version>
+    <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+    <Version>2.1.0</Version>
     <Authors>Sergey Savchuk</Authors>
     <Description>DnsZone is a tool for parsing and formating dnz zone files according to RFC1035 and RFC1034.</Description>
     <RepositoryUrl>https://github.com/SavchukSergey/DnsZone</RepositoryUrl>
     <PackageTags>DNS, Zone, Bind</PackageTags>
     <NeutralLanguage>en-US</NeutralLanguage>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
     <None Include="..\LICENSE">

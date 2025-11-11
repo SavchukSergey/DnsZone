@@ -6,9 +6,9 @@ using DnsZone.Records;
 namespace DnsZone.Formatter {
     public class DnsZoneFormatterContext {
 
-		private const char TAB_CHAR = '\t';
+        private const char TAB_CHAR = '\t';
 
-        public string Origin { get; set; }
+        public string? Origin { get; set; }
 
         public TimeSpan? DefaultTtl { get; set; }
 
@@ -53,10 +53,18 @@ namespace DnsZone.Formatter {
 
         public void WriteIpAddress(IPAddress val) {
             Sb.Append(val);
+        }
+
+        public void WriteIpAddressTab(IPAddress val) {
+            Sb.Append(val);
             Sb.Append(TAB_CHAR);
         }
 
         public void WriteTimeSpan(TimeSpan val) {
+            Sb.Append(DnsZoneUtils.FormatTimeSpan(val));
+        }
+
+        public void WriteTimeSpanTab(TimeSpan val) {
             Sb.Append(DnsZoneUtils.FormatTimeSpan(val));
             Sb.Append(TAB_CHAR);
         }
@@ -83,6 +91,12 @@ namespace DnsZone.Formatter {
             AppendLine($"$ORIGIN {origin}.");
         }
 
+        public void WriteTtl(TimeSpan value) {
+            Sb.Append("$TTL ");
+            WriteTimeSpan(value);
+            Sb.Append('\n');
+        }
+
         public void WriteResourceRecordType(ResourceRecordType val) {
             Sb.Append(DnsZoneUtils.FormatResourceRecordType(val));
             Sb.Append(TAB_CHAR);
@@ -94,7 +108,7 @@ namespace DnsZone.Formatter {
             }
             var relativeSuffix = "." + Origin;
             if (Origin != null && val.EndsWith(relativeSuffix)) {
-				return val[..^relativeSuffix.Length];
+                return val[..^relativeSuffix.Length];
             }
             return val + ".";
         }

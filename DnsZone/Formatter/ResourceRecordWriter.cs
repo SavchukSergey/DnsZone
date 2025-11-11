@@ -100,10 +100,10 @@ namespace DnsZone.Formatter {
             context.WriteAndCompressDomainName(record.NameServer);
             context.WriteEmail(record.ResponsibleEmail);
             context.WriteSerialNumber(record.SerialNumber);
-            context.WriteTimeSpan(record.Refresh);
-            context.WriteTimeSpan(record.Retry);
-            context.WriteTimeSpan(record.Expiry);
-            context.WriteTimeSpan(record.Minimum);
+            context.WriteTimeSpanTab(record.Refresh);
+            context.WriteTimeSpanTab(record.Retry);
+            context.WriteTimeSpanTab(record.Expiry);
+            context.WriteTimeSpanTab(record.Minimum);
             return record;
         }
 

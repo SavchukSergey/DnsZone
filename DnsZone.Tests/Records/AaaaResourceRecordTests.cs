@@ -53,7 +53,7 @@ squat      IN      AAAA      2001:db8:0:0:1::13  ; address in another subnet";
 
             zone.Records.Add(record);
             var sOutput = zone.ToString();
-            Assert.That(sOutput, Is.EqualTo(";AAAA records\nexample.com.\tIN\t\tAAAA\t2001:db8:10::1\t\n\n"));
+            Assert.That(sOutput, Is.EqualTo(";AAAA records\nexample.com.\tIN\t\tAAAA\t2001:db8:10::1\n\n"));
         }
     }
 }
