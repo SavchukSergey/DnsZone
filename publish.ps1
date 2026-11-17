@@ -1,10 +1,11 @@
 $project = "DnsZone"
 $projectFile = "./$project/$project.csproj"
 $configuration = "Release"
-$version = "1.2.1"
+$version = ([xml](Get-Content $projectFile)).Project.PropertyGroup.Version | Where-Object { $_ } | Select-Object -First 1
 
 $source="https://api.nuget.org/v3/index.json"
-$key = Get-Content nuget.key
+$keyFile = if (Test-Path nuget.key) { "nuget.key" } else { "../nuget.key" }
+$key = Get-Content $keyFile
 
 & dotnet restore $projectFile
 & dotnet build $projectFile -c $configuration
