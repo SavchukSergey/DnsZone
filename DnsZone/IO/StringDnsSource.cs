@@ -16,7 +16,7 @@ namespace DnsZone.IO {
             throw new InvalidOperationException("cannot use $INCLUDE directive for single file DNS zone");
         }
 
-        public string ResolveFile(string fileName, string referrer) {
+        public string? ResolveFile(string fileName, string? referrer) {
             return fileName;
         }
 

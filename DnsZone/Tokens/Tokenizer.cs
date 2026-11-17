@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace DnsZone.Tokens {
     public static class Tokenizer {
@@ -42,12 +43,13 @@ namespace DnsZone.Tokens {
                 if (ch < '0' || ch > '9') throw new TokenException("unexpected escape sequence", new Token { Position = position });
                 code = code * 10 + (ch - '0');
             }
+            if (code > 255) throw new TokenException("escape sequence value is out of range", new Token { Position = position });
             return (char)code;
         }
 
         private static string ReadString(ref string content, ref int pos, ref TokenPosition position) {
             var quoteCh = content[pos++];
-            var token = "";
+            var token = new StringBuilder();
             while (pos < content.Length) {
                 var ch = content[pos++];
                 if (ch == '\r' || ch == '\n') {
@@ -56,37 +58,51 @@ namespace DnsZone.Tokens {
                 if (ch == '\\') {
                     if (pos >= content.Length) throw new TokenException("unexpected end of escape sequence", new Token { Position = position });
                     ch = content[pos];
-                    if (char.IsDigit(ch)) {
-                        ch = ReadCharCode(ref content, ref pos, ref position);
-                        token += ch;
+                    if (ch >= '0' && ch <= '9') {
+                        token.Append(ReadCharCode(ref content, ref pos, ref position));
                     } else {
                         pos++;
-                        token += ch;
+                        token.Append(ch);
                     }
                 } else if (ch == quoteCh) {
-                    return token;
+                    return token.ToString();
                 } else {
-                    token += ch;
+                    token.Append(ch);
                 }
             }
             throw new TokenException("missing end quote", new Token { Position = position });
         }
 
-        private static ReadOnlyMemory<char> ReadCharacterString(ref string content, ref int chIndex) {
+        private static bool IsTokenTerminator(char ch) {
+            return char.IsWhiteSpace(ch) || ch == ';' || ch == '(' || ch == ')' || ch == '"';
+        }
+
+        /// <summary>
+        /// Reads unquoted token. Escape sequences are preserved as is (so that escaped dots in domain names keep their meaning),
+        /// but escaped characters never terminate the token.
+        /// </summary>
+        private static string ReadCharacterString(ref string content, ref int chIndex, ref TokenPosition position) {
             var startIndex = chIndex;
             while (chIndex < content.Length) {
                 var ch = content[chIndex];
-                if (ch == '\r' || ch == '\n') {
-                    return content.AsMemory(startIndex, chIndex - startIndex);
+                if (ch == '\\') {
+                    chIndex++;
+                    if (chIndex >= content.Length) throw new TokenException("unexpected end of escape sequence", new Token { Position = position });
+                    if (content[chIndex] >= '0' && content[chIndex] <= '9') {
+                        ReadCharCode(ref content, ref chIndex, ref position);
+                    } else {
+                        chIndex++;
+                    }
+                    continue;
                 }
-                if (char.IsWhiteSpace(ch)) {
-                    var endIndex = chIndex;
-                    SkipWhitespace(ref content, ref chIndex);
-                    return content.AsMemory(startIndex, endIndex - startIndex);
+                if (IsTokenTerminator(ch)) {
+                    break;
                 }
                 chIndex++;
             }
-            return content.AsMemory(startIndex);
+            var res = content.Substring(startIndex, chIndex - startIndex);
+            SkipWhitespace(ref content, ref chIndex);
+            return res;
         }
 
         public static IEnumerable<Token> Read(FileSource source) {
@@ -96,18 +112,17 @@ namespace DnsZone.Tokens {
             var lineStart = 0;
             var parentheses = 0;
             while (pos < content.Length) {
-                if (pos >= content.Length) break;
                 var position = new TokenPosition { File = source, Line = lineNumber, LineStart = lineStart };
 
                 var ch = content[pos];
 
                 switch (ch) {
-                    case '$':
+                    case '$' when pos == lineStart && parentheses == 0:
                         pos++;
                         yield return new Token {
                             Type = TokenType.Control,
                             Position = position,
-                            StringValue = ReadCharacterString(ref content, ref pos).ToString()
+                            StringValue = ReadCharacterString(ref content, ref pos, ref position)
                         };
                         break;
                     case '"':
@@ -157,9 +172,12 @@ namespace DnsZone.Tokens {
                                 };
                             }
                             SkipWhitespace(ref content, ref pos);
+                            if (pos < content.Length && char.IsWhiteSpace(content[pos]) && content[pos] != '\r' && content[pos] != '\n') {
+                                pos++; // other unicode whitespace
+                            }
                         } else {
                             yield return new Token {
-                                StringValue = ReadCharacterString(ref content, ref pos).ToString(),
+                                StringValue = ReadCharacterString(ref content, ref pos, ref position),
                                 Position = position,
                                 Type = TokenType.Literal
                             };

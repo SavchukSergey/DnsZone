@@ -40,7 +40,7 @@ autodiscover    IN  CNAME   autodiscover.test.com.";
 
             zone.Records.Add(record);
             var sOutput = zone.ToString();
-            Assert.That(sOutput, Is.EqualTo(";CNAME records\nautodiscover.example.com.\tIN\t\tCNAME\tautodiscover.test.com.\t\n\n"));
+            Assert.That(sOutput, Is.EqualTo(";CNAME records\nautodiscover.example.com.\tIN\t0\tCNAME\tautodiscover.test.com.\t\n\n"));
         }
     }
 }

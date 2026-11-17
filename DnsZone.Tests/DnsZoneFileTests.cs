@@ -167,12 +167,12 @@ sub	600	IN	A	184.168.221.15
             });
             var val = zone.ToString(origin: null, defaultTtl: TimeSpan.FromSeconds(5));
             var TAB_CHAR = '\t';
-            Assert.That(val, Is.EqualTo($@"$TTL 5
-;A records
-www.example.com.{TAB_CHAR}IN{TAB_CHAR}15m{TAB_CHAR}A{TAB_CHAR}127.0.0.1
-ftp.example.com.{TAB_CHAR}IN{TAB_CHAR}15m{TAB_CHAR}A{TAB_CHAR}127.0.0.1
-
-"));
+            Assert.That(val, Is.EqualTo(
+                $"$TTL 5\n" +
+                $";A records\n" +
+                $"www.example.com.{TAB_CHAR}IN{TAB_CHAR}15m{TAB_CHAR}A{TAB_CHAR}127.0.0.1\n" +
+                $"ftp.example.com.{TAB_CHAR}IN{TAB_CHAR}15m{TAB_CHAR}A{TAB_CHAR}127.0.0.1\n" +
+                $"\n"));
         }
 
         [Test]

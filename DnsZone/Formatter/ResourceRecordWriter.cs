@@ -60,7 +60,7 @@ namespace DnsZone.Formatter {
             context.WriteString(record.Flags);
             context.WriteString(record.Services);
             context.WriteString(record.Regexp);
-            context.WriteDomainName(record.Replacement);
+            context.WriteAndCompressDomainName(record.Replacement);
             return record;
         }
 
@@ -116,7 +116,7 @@ namespace DnsZone.Formatter {
         }
 
         public ResourceRecord Visit(TxtResourceRecord record, DnsZoneFormatterContext context) {
-            context.WriteString(record.Content);
+            context.WriteStrings(record.Content);
             return record;
         }
 

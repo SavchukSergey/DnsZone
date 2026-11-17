@@ -14,25 +14,27 @@
         public string CertificateAssociationData { get; set; }
 
         public override string Name {
-            get { return $"_{Port}._{Protocol}.{Host}"; }
+            get { return ServiceName.Format(Port?.ToString(System.Globalization.CultureInfo.InvariantCulture), Protocol, Host); }
             set {
-                if (value != null) {
-                    if (value.StartsWith("_")) {
-                        var dotIndex = value.IndexOf('.');
-                        Port = ushort.Parse(value.Substring(1, dotIndex - 1));
-                        value = value.Substring(dotIndex + 1);
+                Port = null;
+                Protocol = null;
+                Host = value;
+                if (value == null) return;
+                var rest = value;
+                if (ServiceName.TryTakeLabel(ref rest, out var label)) {
+                    if (ushort.TryParse(label, System.Globalization.NumberStyles.None, System.Globalization.CultureInfo.InvariantCulture, out var port)) {
+                        Port = port;
+                        value = rest;
+                        if (ServiceName.TryTakeLabel(ref rest, out var protocol)) {
+                            Protocol = protocol;
+                            value = rest;
+                        }
+                    } else {
+                        Protocol = label;
+                        value = rest;
                     }
-                    if (value.StartsWith("_")) {
-                        var dotIndex = value.IndexOf('.');
-                        Protocol = value.Substring(1, dotIndex - 1);
-                        value = value.Substring(dotIndex + 1);
-                    }
-                    Host = value;
-                } else {
-                    Port = null;
-                    Protocol = null;
-                    Host = null;
                 }
+                Host = value;
             }
         }
 

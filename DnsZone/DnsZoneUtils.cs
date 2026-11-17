@@ -124,65 +124,59 @@ namespace DnsZone {
             return true;
         }
 
-        public static TimeSpan ParseTimeSpan(string val) {
-            var res = TimeSpan.Zero;
-            int? part = null;
-            foreach (var ch in val) {
-                if (ch >= '0' && ch <= '9') {
-                    part = (part ?? 0) * 10 + (ch - '0');
-                } else {
-                    if (part == null) throw new FormatException("timespan value expected");
-                    res += char.ToLowerInvariant(ch) switch {
-                        'w' => TimeSpan.FromDays(part.Value * 7),
-                        'd' => TimeSpan.FromDays(part.Value),
-                        'h' => TimeSpan.FromHours(part.Value),
-                        'm' => TimeSpan.FromMinutes(part.Value),
-                        's' => TimeSpan.FromSeconds(part.Value),
-                        _ => throw new NotSupportedException($"timespan unit {ch} is not supported"),
-                    };
+        /// <summary>
+        /// Maximum TTL value according to RFC 2181 section 8
+        /// </summary>
+        public static readonly TimeSpan MaxTtl = TimeSpan.FromSeconds(int.MaxValue);
 
-                    part = null;
-                }
-            }
-            if (part != null) {
-                res += TimeSpan.FromSeconds(part.Value);
+        public static TimeSpan ParseTimeSpan(string val) {
+            if (!TryParseTimeSpan(val, out var res)) {
+                throw new FormatException($"invalid timespan value '{val}'");
             }
             return res;
         }
 
-        public static bool TryParseTimeSpan(string val, out TimeSpan timestamp) {
+        public static bool TryParseTimeSpan(string? val, out TimeSpan timestamp) {
             timestamp = TimeSpan.Zero;
-            int? part = null;
+            if (string.IsNullOrEmpty(val)) return false;
+            long total = 0;
+            long? part = null;
             foreach (var ch in val) {
                 if (ch >= '0' && ch <= '9') {
                     part = (part ?? 0) * 10 + (ch - '0');
+                    if (part > int.MaxValue) return false;
                 } else {
                     if (part == null) return false;
-                    switch (char.ToLower(ch)) {
+                    long multiplier;
+                    switch (char.ToLowerInvariant(ch)) {
                         case 'w':
-                            timestamp += TimeSpan.FromDays(part.Value * 7);
+                            multiplier = 7 * 24 * 3600;
                             break;
                         case 'd':
-                            timestamp += TimeSpan.FromDays(part.Value);
+                            multiplier = 24 * 3600;
                             break;
                         case 'h':
-                            timestamp += TimeSpan.FromHours(part.Value);
+                            multiplier = 3600;
                             break;
                         case 'm':
-                            timestamp += TimeSpan.FromMinutes(part.Value);
+                            multiplier = 60;
                             break;
                         case 's':
-                            timestamp += TimeSpan.FromSeconds(part.Value);
+                            multiplier = 1;
                             break;
                         default:
                             return false;
                     }
+                    total += part.Value * multiplier;
+                    if (total > int.MaxValue) return false;
                     part = null;
                 }
             }
             if (part != null) {
-                timestamp += TimeSpan.FromSeconds(part.Value);
+                total += part.Value;
+                if (total > int.MaxValue) return false;
             }
+            timestamp = TimeSpan.FromSeconds(total);
             return true;
         }
 
@@ -218,6 +212,41 @@ namespace DnsZone {
                 sb.Append(sb.Length > 0 ? $"{seconds}s" : $"{seconds}");
             }
 
+            return sb.Length > 0 ? sb.ToString() : "0";
+        }
+
+        /// <summary>
+        /// Checks whether domain name in presentation format is absolute (ends with non-escaped dot)
+        /// </summary>
+        public static bool IsAbsoluteDomainName(string val) {
+            if (!val.EndsWith('.')) return false;
+            var backslashes = 0;
+            for (var i = val.Length - 2; i >= 0 && val[i] == '\\'; i--) {
+                backslashes++;
+            }
+            return backslashes % 2 == 0;
+        }
+
+        /// <summary>
+        /// Decodes RFC 1035 escape sequences (\X and \DDD) of unquoted character-string
+        /// </summary>
+        public static string UnescapeCharacterString(string val) {
+            if (val.IndexOf('\\') < 0) return val;
+            var sb = new StringBuilder(val.Length);
+            for (var i = 0; i < val.Length; i++) {
+                var ch = val[i];
+                if (ch == '\\' && i + 1 < val.Length) {
+                    if (i + 3 < val.Length && char.IsAsciiDigit(val[i + 1]) && char.IsAsciiDigit(val[i + 2]) && char.IsAsciiDigit(val[i + 3])) {
+                        sb.Append((char)((val[i + 1] - '0') * 100 + (val[i + 2] - '0') * 10 + (val[i + 3] - '0')));
+                        i += 3;
+                    } else {
+                        sb.Append(val[i + 1]);
+                        i++;
+                    }
+                } else {
+                    sb.Append(ch);
+                }
+            }
             return sb.ToString();
         }
 

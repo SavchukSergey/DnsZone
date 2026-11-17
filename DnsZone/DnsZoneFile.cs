@@ -20,14 +20,25 @@ namespace DnsZone {
 
         public DnsZoneFile Filter(string origin) {
             var res = new DnsZoneFile();
-            origin = origin.ToLowerInvariant();
-            var subdomain = ("." + origin);
+            origin = NormalizeOrigin(origin)!;
+            var subdomain = "." + origin;
             foreach (var record in Records) {
-                if (record.Name.ToLowerInvariant() == origin || record.Name.EndsWith(subdomain)) {
+                var name = record.Name;
+                if (name == null) continue;
+                if (string.Equals(name, origin, StringComparison.OrdinalIgnoreCase) || name.EndsWith(subdomain, StringComparison.OrdinalIgnoreCase)) {
                     res.Records.Add(record);
                 }
             }
             return res;
+        }
+
+        /// <summary>
+        /// Removes single trailing dot from the domain name (except root domain)
+        /// </summary>
+        internal static string? NormalizeOrigin(string? origin) {
+            if (string.IsNullOrWhiteSpace(origin)) return null;
+            if (origin == ".") return origin;
+            return DnsZoneUtils.IsAbsoluteDomainName(origin) ? origin[..^1] : origin;
         }
 
         public DnsZoneFile Add(DnsZoneFile other) {
@@ -46,6 +57,7 @@ namespace DnsZone {
         }
 
         public string ToString(string? origin = null, TimeSpan? defaultTtl = null) {
+            origin = NormalizeOrigin(origin);
             var sb = new StringBuilder();
             var context = new DnsZoneFormatterContext(this, sb) {
                 Origin = origin
@@ -90,19 +102,18 @@ namespace DnsZone {
         /// <returns></returns>
         public static DnsZoneFile Parse(IDnsSource source, string? origin = null) {
             var fileSource = new FileSource {
-                Content = source.LoadContent(null)
+                Content = source.LoadContent(null!)
             };
             var tokens = Tokenizer.Read(fileSource).ToArray();
             var context = new DnsZoneParseContext(tokens, source) {
-                Origin = origin
+                Origin = NormalizeOrigin(origin)
             };
             Process(context);
             return context.Zone;
         }
 
         private static void Process(DnsZoneParseContext context) {
-            while (!context.IsEof) {
-                var token = context.Tokens.Peek();
+            while (context.TryPeek(out var token)) {
                 switch (token.Type) {
                     case TokenType.NewLine:
                     case TokenType.Comments:
@@ -116,39 +127,50 @@ namespace DnsZone {
                         ParseResourceRecord(context);
                         break;
                     default:
-                        throw new NotSupportedException($"not supported type {token.Type}");
+                        throw new TokenException($"unexpected token {token.Type}", token);
                 }
             }
         }
 
+        private static bool IsEndOfLine(DnsZoneParseContext context) {
+            return !context.TryPeek(out var token) || token.Type == TokenType.NewLine;
+        }
+
         private static void ProcessControlDirective(DnsZoneParseContext context) {
-            var token = context.Tokens.Dequeue();
+            var token = context.Next("control directive expected");
             var directive = token.StringValue;
             switch (directive.ToUpperInvariant()) {
                 case "ORIGIN":
                     context.Origin = context.ReadAndResolveDomainName();
                     break;
                 case "INCLUDE":
-                    var firstToken = context.Tokens.Dequeue();
-                    var secondToken = context.Tokens.Dequeue();
-                    if (secondToken.Type == TokenType.NewLine) {
-                        ProcessIncludeDirective(context, context.Origin, firstToken.StringValue);
-                    } else {
-                        context.Tokens.Dequeue(); //end of line
-                        ProcessIncludeDirective(context, secondToken.StringValue, firstToken.StringValue);
+                    var fileToken = context.Next("file name expected");
+                    if (fileToken.Type != TokenType.Literal && fileToken.Type != TokenType.QuotedString) {
+                        throw new TokenException("file name expected", fileToken);
                     }
+                    string? origin = null;
+                    if (!IsEndOfLine(context)) {
+                        origin = context.ReadAndResolveDomainName();
+                    }
+                    ProcessIncludeDirective(context, origin, fileToken);
                     break;
                 case "TTL":
                     context.DefaultTtl = context.ReadTimeSpan();
                     break;
                 default:
-                    throw new NotSupportedException($"Unknown control directive '{directive}'");
+                    throw new TokenException($"unknown control directive '{directive}'", token);
+            }
+            if (!IsEndOfLine(context)) {
+                var extra = context.Tokens.Peek();
+                throw new TokenException($"unexpected token '{extra.StringValue}' after {directive} directive", extra);
             }
         }
 
-        private static void ProcessIncludeDirective(DnsZoneParseContext context, string origin, string fileName) {
-            var childContext = context.CreateChildContext(fileName);
-            childContext.Origin = context.ResolveDomainName(origin);
+        private static void ProcessIncludeDirective(DnsZoneParseContext context, string? origin, Token fileToken) {
+            var childContext = context.CreateChildContext(fileToken.StringValue, fileToken);
+            if (origin != null) {
+                childContext.Origin = origin;
+            }
             Process(childContext);
             context.Zone.Add(childContext.Zone);
         }
@@ -157,36 +179,22 @@ namespace DnsZone {
             string? @class = null;
             TimeSpan? ttl = null;
 
-            if (context.Tokens.Count == 0) {
-                return;
-            }
-
             string? name = null;
-            var nameToken = context.Tokens.Dequeue();
+            var nameToken = context.Next("resource record expected");
             if (nameToken.Type == TokenType.Literal) {
                 name = nameToken.StringValue;
             } else if (nameToken.Type == TokenType.Whitespace) {
-                var preview = context.Tokens.Peek();
-                if (preview.Type == TokenType.NewLine || preview.Type == TokenType.NewLine) {
-                    context.Tokens.Dequeue();
+                if (IsEndOfLine(context)) {
                     return;
                 }
-                name = "";
-            } else if (nameToken.Type == TokenType.Comments) {
-                return;
-            } else if (nameToken.Type == TokenType.NewLine) {
+            } else {
                 return;
             }
 
             while (@class == null || ttl == null) {
-                if (context.Tokens.Count == 0) {
-                    if (string.IsNullOrWhiteSpace(name)) {
-                        return;
-                    } else {
-                        throw new TokenException("missing record type", nameToken);
-                    }
+                if (!context.TryPeek(out var token)) {
+                    throw new TokenException("missing record type", nameToken);
                 }
-                var token = context.Tokens.Peek();
                 if (token.Type == TokenType.Literal) {
                     if (@class == null) {
                         if (context.TryParseClass(out @class)) continue;
@@ -205,23 +213,25 @@ namespace DnsZone {
             var type = context.ReadResourceRecordType();
 
             string domainName;
-            try {
-                domainName = context.ResolveDomainName(!string.IsNullOrWhiteSpace(name) ? name : context.PrevName);
-            } catch (ArgumentException exc) {
-                throw new TokenException(exc.Message, nameToken);
+            if (name != null) {
+                try {
+                    domainName = context.ResolveDomainName(name);
+                } catch (ArgumentException exc) {
+                    throw new TokenException(exc.Message, nameToken);
+                }
+            } else {
+                domainName = context.PrevName ?? throw new TokenException("owner name is omitted, but there is no previous owner", nameToken);
             }
             var record = DnsZoneUtils.CreateRecord(type);
             record.Name = domainName;
-            record.Class = !string.IsNullOrWhiteSpace(@class) ? @class : context.PrevClass;
-            record.Ttl = context.GetTimeSpan(ttl);
+            record.Class = !string.IsNullOrWhiteSpace(@class) ? @class : context.PrevClass!;
+            record.Ttl = context.GetTimeSpan(ttl, nameToken);
 
             record.AcceptVistor(_reader, context);
 
             context.Zone.Records.Add(record);
 
-            if (!string.IsNullOrWhiteSpace(name)) {
-                context.PrevName = name;
-            }
+            context.PrevName = domainName;
 
             if (!string.IsNullOrWhiteSpace(@class)) {
                 context.PrevClass = @class;
@@ -239,7 +249,7 @@ namespace DnsZone {
             using var file = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
             using var reader = new StreamReader(file);
             var content = await reader.ReadToEndAsync();
-            return Parse(content, explicitOrigin);
+            return Parse(new FileDnsSource(path, content), explicitOrigin);
         }
 
     }

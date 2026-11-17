@@ -16,24 +16,18 @@
         public string Host { get; set; }
 
         public override string Name {
-            get { return $"_{Service}._{Protocol}.{Host}"; }
+            get { return ServiceName.Format(Service, Protocol, Host); }
             set {
-                if (value != null) {
-                    if (value.StartsWith("_")) {
-                        var dotIndex = value.IndexOf('.');
-                        Service = value.Substring(1, dotIndex - 1);
-                        value = value.Substring(dotIndex + 1);
-                    }
-                    if (value.StartsWith("_")) {
-                        var dotIndex = value.IndexOf('.');
-                        Protocol = value.Substring(1, dotIndex - 1);
-                        value = value.Substring(dotIndex + 1);
+                Service = null;
+                Protocol = null;
+                Host = value;
+                if (value == null) return;
+                if (ServiceName.TryTakeLabel(ref value, out var service)) {
+                    Service = service;
+                    if (ServiceName.TryTakeLabel(ref value, out var protocol)) {
+                        Protocol = protocol;
                     }
                     Host = value;
-                } else {
-                    Service = null;
-                    Protocol = null;
-                    Host = null;
                 }
             }
         }

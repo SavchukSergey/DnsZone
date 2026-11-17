@@ -1,0 +1,3 @@
+$ORIGIN eof.com.
+$TTL 1h
+$INCLUDE eof_child.zone sub

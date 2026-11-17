@@ -41,7 +41,7 @@ alias1         IN  ALIAS     new.origin.com             ; Alias for alias1.examp
             
             zone.Records.Add(record);
             var sOutput = zone.ToString();
-            Assert.That(sOutput, Is.EqualTo(";ALIAS records\nexample.com.\tIN\t\tALIAS\thost.external.org\t\n\n"));
+            Assert.That(sOutput, Is.EqualTo(";ALIAS records\nexample.com.\tIN\t0\tALIAS\thost.external.org\t\n\n"));
         }
     }
 }

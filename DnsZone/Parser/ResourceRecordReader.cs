@@ -1,7 +1,4 @@
-﻿using System;
-using System.Text;
-using DnsZone.Records;
-using DnsZone.Tokens;
+﻿using DnsZone.Records;
 
 namespace DnsZone.Parser {
     public class ResourceRecordReader : IResourceRecordVisitor<DnsZoneParseContext, ResourceRecord> {
@@ -98,37 +95,14 @@ namespace DnsZone.Parser {
         }
 
         public ResourceRecord Visit(TxtResourceRecord record, DnsZoneParseContext context) {
-            var sb = new StringBuilder();
-            while (!context.IsEof) {
-                var token = context.Tokens.Peek();
-                if (token.Type == TokenType.NewLine) break;
-                if (token.Type == TokenType.QuotedString || token.Type == TokenType.Literal) {
-                    sb.Append(token.StringValue);
-                    context.Tokens.Dequeue();
-                } else {
-                    throw new NotSupportedException($"unexpected token {token.Type}");
-                }
-            }
-            record.Content = sb.ToString();
+            record.Content = string.Concat(context.ReadStringValues());
             return record;
         }
 
         public ResourceRecord Visit(CAAResourceRecord record, DnsZoneParseContext context) {
             record.Flag = context.ReadU16();
-            record.Tag = context.Tokens.Dequeue().StringValue;
-            var sb = new StringBuilder();
-            while (!context.IsEof) {
-                var token = context.Tokens.Peek();
-                if (token.Type == TokenType.NewLine) break;
-                if (token.Type == TokenType.QuotedString || token.Type == TokenType.Literal) {
-                    sb.Append(token.StringValue);
-                    context.Tokens.Dequeue();
-                } else {
-                    throw new NotSupportedException($"unexpected token {token.Type}");
-                }
-            }
-            record.Value = sb.ToString();
-
+            record.Tag = context.ReadString();
+            record.Value = string.Concat(context.ReadStringValues());
             return record;
         }
 

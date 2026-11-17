@@ -40,7 +40,7 @@ subdomain.example.com. IN	DNAME  host.example.org.";
             
             zone.Records.Add(record);
             var sOutput = zone.ToString();
-            Assert.That(sOutput, Is.EqualTo(";DNAME records\nsubdomain.example.com.\tIN\t\tDNAME\thost.example.org.\t\n\n"));
+            Assert.That(sOutput, Is.EqualTo(";DNAME records\nsubdomain.example.com.\tIN\t0\tDNAME\thost.example.org.\t\n\n"));
         }
     }
 }

@@ -1,0 +1,4 @@
+$ORIGIN inherit.com.
+$TTL 1h
+host IN A 10.0.0.1
+$INCLUDE inherit_child.zone
