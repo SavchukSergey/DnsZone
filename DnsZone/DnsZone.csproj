@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+    <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
     <Version>2.2.0</Version>
     <Authors>Sergey Savchuk</Authors>
     <Description>DnsZone is a tool for parsing and formating dnz zone files according to RFC1035 and RFC1034.</Description>
