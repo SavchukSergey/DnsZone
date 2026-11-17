@@ -304,6 +304,75 @@ namespace DnsZone.Tests {
             Assert.That(record.Replacement, Is.EqualTo("_sip._udp.ex.com"));
         }
 
+        [Test]
+        public void UnquotedLua() {
+            var zone = DnsZoneFile.Parse("$ORIGIN ex.com.\n@ 1h IN LUA A ifportup\n");
+            Assert.That(zone.Records.OfType<LuaResourceRecord>().Single().Script, Is.EqualTo("ifportup"));
+        }
+
+        [Test]
+        public void QuotedCaaTag() {
+            var zone = DnsZoneFile.Parse("$ORIGIN ex.com.\n@ 1h IN CAA 0 \"issue\" \"letsencrypt.org\"\n");
+            var record = zone.Records.OfType<CAAResourceRecord>().Single();
+            Assert.That(record.Tag, Is.EqualTo("issue"));
+            Assert.That(record.Value, Is.EqualTo("letsencrypt.org"));
+        }
+
+        #endregion
+
+        #region review of fixes
+
+        [TestCase("www.example.com.. 1h IN A 1.2.3.4\n")]
+        [TestCase("www..example.com. 1h IN A 1.2.3.4\n")]
+        [TestCase(".www 1h IN A 1.2.3.4\n")]
+        public void EmptyLabelIsRejected(string content) {
+            Assert.Throws<TokenException>(() => DnsZoneFile.Parse(content, "example.com"));
+        }
+
+        [Test]
+        public void ProgrammaticNameWithTrailingDot() {
+            var zone = new DnsZoneFile();
+            zone.Records.Add(new AResourceRecord { Name = "example.com.", Class = "IN", Ttl = TimeSpan.FromHours(1), Address = IPAddress.Parse("1.2.3.4") });
+            zone.Records.Add(new AResourceRecord { Name = "www.example.com.", Class = "IN", Ttl = TimeSpan.FromHours(1), Address = IPAddress.Parse("1.2.3.5") });
+            Assert.That(zone.ToString(), Does.Contain("\nexample.com.\tIN").And.Not.Contain(".."));
+            var text = zone.ToString("example.com");
+            Assert.That(text, Does.Contain("\n@\tIN").And.Contain("\nwww\tIN"));
+            Assert.That(zone.Filter("example.com").Records.Count, Is.EqualTo(2));
+        }
+
+        [TestCase("MD")]
+        [TestCase("NULL")]
+        [TestCase("WKS")]
+        public void UnimplementedTypeThrowsTokenException(string type) {
+            var exc = Assert.Throws<TokenException>(() => DnsZoneFile.Parse($"$ORIGIN ex.com.\n\n@ 1h IN {type} foo\n"));
+            Assert.That(exc!.Token.Position.Line, Is.EqualTo(3));
+        }
+
+        [TestCase("100000w")]
+        [TestCase("99999999999")]
+        [TestCase("5q")]
+        public void InvalidTtlDiagnostic(string ttl) {
+            var exc = Assert.Throws<TokenException>(() => DnsZoneFile.Parse($"ex.com. {ttl} IN A 1.2.3.4\n"));
+            Assert.That(exc!.Message, Does.Contain("ttl"));
+        }
+
+        [Test]
+        public void RootOriginRoundTrip() {
+            var zone = DnsZoneFile.Parse("$ORIGIN .\n$TTL 1h\n@ IN NS a.root-servers.net.\ncom IN NS a.gtld-servers.net.\n");
+            foreach (var origin in new string?[] { null, "." }) {
+                var reparsed = DnsZoneFile.Parse(zone.ToString(origin));
+                Assert.That(reparsed.Records.Select(r => r.Name), Is.EqualTo(new[] { ".", "com" }));
+                Assert.That(reparsed.Records.OfType<NsResourceRecord>().Select(r => r.NameServer), Is.EqualTo(new[] { "a.root-servers.net", "a.gtld-servers.net" }));
+            }
+        }
+
+        [Test]
+        public void CrLfInput() {
+            var zone = DnsZoneFile.Parse("$ORIGIN ex.com.\r\n$TTL 1h\r\n@ IN SOA ns host (\r\n 1 2 3 4 5 )\r\nwww IN A 1.2.3.4\r\n");
+            Assert.That(zone.Records.Count, Is.EqualTo(2));
+            Assert.That(zone.Single<AResourceRecord>("www.ex.com").Address, Is.EqualTo(IPAddress.Parse("1.2.3.4")));
+        }
+
         #endregion
     }
 }

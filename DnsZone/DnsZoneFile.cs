@@ -23,7 +23,7 @@ namespace DnsZone {
             origin = NormalizeOrigin(origin)!;
             var subdomain = "." + origin;
             foreach (var record in Records) {
-                var name = record.Name;
+                var name = NormalizeOrigin(record.Name);
                 if (name == null) continue;
                 if (string.Equals(name, origin, StringComparison.OrdinalIgnoreCase) || name.EndsWith(subdomain, StringComparison.OrdinalIgnoreCase)) {
                     res.Records.Add(record);
@@ -201,6 +201,9 @@ namespace DnsZone {
                     }
                     if (@ttl == null) {
                         if (context.TryParseTtl(out ttl)) continue;
+                        if (DnsZoneParseContext.LooksLikeTtl(token)) {
+                            throw new TokenException($"invalid ttl value '{token.StringValue}' (max {int.MaxValue} seconds)", token);
+                        }
                     }
                     break;
                 } else if (token.Type == TokenType.Comments || token.Type == TokenType.NewLine) {
@@ -222,7 +225,12 @@ namespace DnsZone {
             } else {
                 domainName = context.PrevName ?? throw new TokenException("owner name is omitted, but there is no previous owner", nameToken);
             }
-            var record = DnsZoneUtils.CreateRecord(type);
+            ResourceRecord record;
+            try {
+                record = DnsZoneUtils.CreateRecord(type);
+            } catch (NotSupportedException exc) {
+                throw new TokenException(exc.Message, nameToken);
+            }
             record.Name = domainName;
             record.Class = !string.IsNullOrWhiteSpace(@class) ? @class : context.PrevClass!;
             record.Ttl = context.GetTimeSpan(ttl, nameToken);

@@ -101,7 +101,7 @@ namespace DnsZone.Parser {
 
         public ResourceRecord Visit(CAAResourceRecord record, DnsZoneParseContext context) {
             record.Flag = context.ReadU16();
-            record.Tag = context.ReadString();
+            record.Tag = context.ReadStringValue();
             record.Value = string.Concat(context.ReadStringValues());
             return record;
         }

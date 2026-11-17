@@ -206,6 +206,9 @@ namespace DnsZone.Parser {
             if (val == ".") {
                 return ".";
             }
+            if (val.StartsWith('.') || val.Contains("..")) {
+                throw new ArgumentException($"domain name '{val}' contains empty label");
+            }
             if (DnsZoneUtils.IsAbsoluteDomainName(val)) {
                 return val[..^1];
             }
@@ -245,6 +248,13 @@ namespace DnsZone.Parser {
             return false;
         }
 
+        /// <summary>
+        /// Checks whether token looks like TTL value (starts with digit), even if it can't be parsed
+        /// </summary>
+        public static bool LooksLikeTtl(Token token) {
+            return token.Type == TokenType.Literal && token.StringValue.Length > 0 && char.IsAsciiDigit(token.StringValue[0]);
+        }
+
         public bool TryParseTtl(out TimeSpan? timestamp) {
             if (TryParseTtl(out TimeSpan val)) {
                 timestamp = val;
@@ -252,6 +262,19 @@ namespace DnsZone.Parser {
             }
             timestamp = null;
             return false;
+        }
+
+        protected void SkipWhiteAndComments() {
+            while (TryPeek(out var token)) {
+                switch (token.Type) {
+                    case TokenType.Whitespace:
+                    case TokenType.Comments:
+                        Tokens.Dequeue();
+                        break;
+                    default:
+                        return;
+                }
+            }
         }
 
         public bool TryParseClass(out string? @class) {

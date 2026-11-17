@@ -143,6 +143,9 @@ namespace DnsZone.Formatter {
             if (val == ".") {
                 return val;
             }
+            if (DnsZoneUtils.IsAbsoluteDomainName(val)) {
+                val = val[..^1];
+            }
             if (Origin != null) {
                 if (string.Equals(val, Origin, StringComparison.OrdinalIgnoreCase)) {
                     return "@";
