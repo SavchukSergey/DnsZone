@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -122,6 +122,101 @@ namespace DnsZone.Parser {
             return val;
         }
 
+        public byte ReadU8() {
+            var token = NextLiteral("U8 value expected");
+            if (!byte.TryParse(token.StringValue, NumberStyles.None, CultureInfo.InvariantCulture, out var val)) {
+                throw new TokenException($"U8 value expected, but '{token.StringValue}' found", token);
+            }
+            return val;
+        }
+
+        public bool IsEndOfRecord => !TryPeek(out var token) || token.Type == TokenType.NewLine;
+
+        /// <summary>
+        /// Reads all literal tokens till the end of the record
+        /// </summary>
+        public List<Token> ReadRemainingLiterals() {
+            var res = new List<Token>();
+            while (!IsEndOfRecord) {
+                res.Add(NextLiteral("literal expected"));
+            }
+            return res;
+        }
+
+        /// <summary>
+        /// Reads Base64 or hex data till the end of the record. Data may be split by whitespace (RFC 4034 section 2.2).
+        /// </summary>
+        public string ReadEncodedData(string expected) {
+            if (IsEndOfRecord) {
+                if (TryPeek(out var token)) throw new TokenException(expected, token);
+                throw CreateEofException(expected);
+            }
+            return string.Concat(ReadRemainingLiterals().Select(item => item.StringValue));
+        }
+
+        /// <summary>
+        /// Reads type mnemonic (e.g. A, RRSIG or TYPE65534)
+        /// </summary>
+        public string ReadTypeMnemonic() {
+            var token = NextLiteral("resource record type expected");
+            if (!DnsZoneUtils.IsTypeMnemonic(token.StringValue)) {
+                throw new TokenException($"resource record type expected, but '{token.StringValue}' found", token);
+            }
+            return token.StringValue.ToUpperInvariant();
+        }
+
+        /// <summary>
+        /// Reads type bit maps till the end of the record (RFC 4034 section 4.2)
+        /// </summary>
+        public List<string> ReadTypeMnemonics() {
+            var res = new List<string>();
+            while (!IsEndOfRecord) {
+                res.Add(ReadTypeMnemonic());
+            }
+            return res;
+        }
+
+        public DateTime ReadDnssecTime() {
+            var token = NextLiteral("signature time expected");
+            if (!DnsZoneUtils.TryParseDnssecTime(token.StringValue, out var val)) {
+                throw new TokenException($"signature time expected, but '{token.StringValue}' found", token);
+            }
+            return val;
+        }
+
+        /// <summary>
+        /// Reads NSEC3 salt: hex string or "-" for empty salt (RFC 5155 section 3.3)
+        /// </summary>
+        public string ReadSalt() {
+            var token = NextLiteral("salt expected");
+            var val = token.StringValue;
+            if (val == "-") return "";
+            if (!DnsZoneUtils.TryParseHex(val, out var bytes) || bytes.Length > 255) {
+                throw new TokenException($"salt expected, but '{val}' found", token);
+            }
+            return val;
+        }
+
+        /// <summary>
+        /// Reads RFC 3597 generic RDATA: \# length hex-data
+        /// </summary>
+        public byte[] ReadGenericData() {
+            var marker = NextLiteral("generic rdata expected");
+            if (marker.StringValue != @"\#") {
+                throw new TokenException($@"generic rdata (\#) expected, but '{marker.StringValue}' found", marker);
+            }
+            var length = ReadU16();
+            var hexTokens = ReadRemainingLiterals();
+            var hex = string.Concat(hexTokens.Select(item => item.StringValue));
+            if (!DnsZoneUtils.TryParseHex(hex, out var data)) {
+                throw new TokenException("generic rdata must be hex encoded", hexTokens.Count > 0 ? hexTokens[0] : marker);
+            }
+            if (data.Length != length) {
+                throw new TokenException($"generic rdata length mismatch: {length} expected, but {data.Length} found", marker);
+            }
+            return data;
+        }
+
         public string ReadDomainName() {
             return NextLiteral("domain name expected").StringValue;
         }
@@ -185,7 +280,17 @@ namespace DnsZone.Parser {
         }
 
         public ResourceRecordType ReadResourceRecordType() {
+            return ReadResourceRecordType(out _);
+        }
+
+        /// <summary>
+        /// Reads record type. Generic TYPEnnn mnemonic (RFC 3597) results in <see cref="ResourceRecordType.Unknown"/>
+        /// </summary>
+        public ResourceRecordType ReadResourceRecordType(out ushort unknownTypeCode) {
             var token = NextLiteral("resource record type expected");
+            if (DnsZoneUtils.TryParseUnknownType(token.StringValue, out unknownTypeCode)) {
+                return ResourceRecordType.Unknown;
+            }
             try {
                 return DnsZoneUtils.ParseResourceRecordType(token.StringValue);
             } catch (NotSupportedException exc) {

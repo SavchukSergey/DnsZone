@@ -36,5 +36,21 @@
         TResult Visit(TLSAResourceRecord record, TArg arg);
 
         TResult Visit(SSHFPResourceRecord record, TArg arg);
+
+        TResult Visit(DnsKeyResourceRecord record, TArg arg);
+
+        TResult Visit(CDnsKeyResourceRecord record, TArg arg);
+
+        TResult Visit(CdsResourceRecord record, TArg arg);
+
+        TResult Visit(RrsigResourceRecord record, TArg arg);
+
+        TResult Visit(NsecResourceRecord record, TArg arg);
+
+        TResult Visit(Nsec3ResourceRecord record, TArg arg);
+
+        TResult Visit(Nsec3ParamResourceRecord record, TArg arg);
+
+        TResult Visit(UnknownResourceRecord record, TArg arg);
     }
 }

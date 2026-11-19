@@ -69,13 +69,13 @@ namespace DnsZone {
                 context.WriteTtl(defaultTtl.Value);
             }
             var writer = new ResourceRecordWriter();
-            foreach (var recordGroup in Records.GroupBy(item => item.Type)) {
+            foreach (var recordGroup in Records.GroupBy(DnsZoneUtils.FormatResourceRecordType)) {
                 context.AppendLine($";{recordGroup.Key} records");
                 foreach (var record in recordGroup) {
                     context.WriteAndCompressDomainName(record.Name);
                     context.WriteClass(record.Class);
                     context.WriteTimeSpanTab(record.Ttl);
-                    context.WriteResourceRecordType(record.Type);
+                    context.WriteResourceRecordType(recordGroup.Key);
                     record.AcceptVistor(writer, context);
                     context.AppendLine();
                 }
@@ -213,7 +213,7 @@ namespace DnsZone {
                 }
             }
 
-            var type = context.ReadResourceRecordType();
+            var type = context.ReadResourceRecordType(out var unknownTypeCode);
 
             string domainName;
             if (name != null) {
@@ -227,7 +227,9 @@ namespace DnsZone {
             }
             ResourceRecord record;
             try {
-                record = DnsZoneUtils.CreateRecord(type);
+                record = type == ResourceRecordType.Unknown
+                    ? new UnknownResourceRecord { TypeCode = unknownTypeCode }
+                    : DnsZoneUtils.CreateRecord(type);
             } catch (NotSupportedException exc) {
                 throw new TokenException(exc.Message, nameToken);
             }

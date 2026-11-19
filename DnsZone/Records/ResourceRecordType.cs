@@ -24,6 +24,17 @@
         DNAME,
         DS,
         LUA,
-        NAPTR
+        NAPTR,
+        DNSKEY,
+        RRSIG,
+        NSEC,
+        NSEC3,
+        NSEC3PARAM,
+        CDS,
+        CDNSKEY,
+        /// <summary>
+        /// Type not known to the library (RFC 3597), see <see cref="UnknownResourceRecord"/>
+        /// </summary>
+        Unknown
     }
 }

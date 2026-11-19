@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Text;
 using DnsZone.Records;
 
@@ -33,6 +34,13 @@ namespace DnsZone {
                 "DS" => ResourceRecordType.DS,
                 "LUA" => ResourceRecordType.LUA,
                 "NAPTR" => ResourceRecordType.NAPTR,
+                "DNSKEY" => ResourceRecordType.DNSKEY,
+                "RRSIG" => ResourceRecordType.RRSIG,
+                "NSEC" => ResourceRecordType.NSEC,
+                "NSEC3" => ResourceRecordType.NSEC3,
+                "NSEC3PARAM" => ResourceRecordType.NSEC3PARAM,
+                "CDS" => ResourceRecordType.CDS,
+                "CDNSKEY" => ResourceRecordType.CDNSKEY,
                 _ => throw new NotSupportedException($"unsupported resource record type {val}"),
             };
 
@@ -65,6 +73,13 @@ namespace DnsZone {
                 ResourceRecordType.DS => "DS",
                 ResourceRecordType.LUA => "LUA",
                 ResourceRecordType.NAPTR => "NAPTR",
+                ResourceRecordType.DNSKEY => "DNSKEY",
+                ResourceRecordType.RRSIG => "RRSIG",
+                ResourceRecordType.NSEC => "NSEC",
+                ResourceRecordType.NSEC3 => "NSEC3",
+                ResourceRecordType.NSEC3PARAM => "NSEC3PARAM",
+                ResourceRecordType.CDS => "CDS",
+                ResourceRecordType.CDNSKEY => "CDNSKEY",
                 _ => throw new NotSupportedException($"unsupported resource record type {val}"),
             };
 
@@ -98,9 +113,83 @@ namespace DnsZone {
                 ResourceRecordType.DS => new DsResourceRecord(),
                 ResourceRecordType.LUA => new LuaResourceRecord(),
                 ResourceRecordType.NAPTR => new NaptrResourceRecord(),
+                ResourceRecordType.DNSKEY => new DnsKeyResourceRecord(),
+                ResourceRecordType.RRSIG => new RrsigResourceRecord(),
+                ResourceRecordType.NSEC => new NsecResourceRecord(),
+                ResourceRecordType.NSEC3 => new Nsec3ResourceRecord(),
+                ResourceRecordType.NSEC3PARAM => new Nsec3ParamResourceRecord(),
+                ResourceRecordType.CDS => new CdsResourceRecord(),
+                ResourceRecordType.CDNSKEY => new CDnsKeyResourceRecord(),
                 _ => throw new NotSupportedException($"unsupported resource record type {type}"),
             };
 
+        }
+
+        /// <summary>
+        /// Formats type of the record. Unknown records are formatted as TYPEnnn (RFC 3597 section 5)
+        /// </summary>
+        public static string FormatResourceRecordType(ResourceRecord record) {
+            if (record is UnknownResourceRecord unknown) {
+                return FormatUnknownType(unknown.TypeCode);
+            }
+            return FormatResourceRecordType(record.Type);
+        }
+
+        /// <summary>
+        /// Parses generic type mnemonic TYPEnnn (RFC 3597 section 5)
+        /// </summary>
+        public static bool TryParseUnknownType(string val, out ushort typeCode) {
+            typeCode = 0;
+            if (val.Length <= 4 || !val.StartsWith("TYPE", StringComparison.OrdinalIgnoreCase)) return false;
+            return ushort.TryParse(val.AsSpan(4), NumberStyles.None, CultureInfo.InvariantCulture, out typeCode);
+        }
+
+        public static string FormatUnknownType(ushort typeCode) {
+            return "TYPE" + typeCode.ToString(CultureInfo.InvariantCulture);
+        }
+
+        /// <summary>
+        /// Checks whether value looks like a type mnemonic (e.g. A, RRSIG or generic TYPEnnn).
+        /// Mnemonics of types not supported by the library are allowed too.
+        /// </summary>
+        public static bool IsTypeMnemonic(string val) {
+            if (val.Length == 0 || !char.IsAsciiLetter(val[0])) return false;
+            foreach (var ch in val) {
+                if (!char.IsAsciiLetterOrDigit(ch) && ch != '-') return false;
+            }
+            return true;
+        }
+
+        private const string DNSSEC_TIME_FORMAT = "yyyyMMddHHmmss";
+
+        /// <summary>
+        /// Parses RRSIG signature time (RFC 4034 section 3.2): either YYYYMMDDHHmmSS in UTC or seconds since epoch
+        /// </summary>
+        public static bool TryParseDnssecTime(string val, out DateTime time) {
+            time = default;
+            if (val.Length == 14) {
+                return DateTime.TryParseExact(val, DNSSEC_TIME_FORMAT, CultureInfo.InvariantCulture,
+                    DateTimeStyles.AdjustToUniversal | DateTimeStyles.AssumeUniversal, out time);
+            }
+            if (!uint.TryParse(val, NumberStyles.None, CultureInfo.InvariantCulture, out var seconds)) return false;
+            time = DateTime.UnixEpoch.AddSeconds(seconds);
+            return true;
+        }
+
+        public static string FormatDnssecTime(DateTime time) {
+            if (time.Kind == DateTimeKind.Local) time = time.ToUniversalTime();
+            return time.ToString(DNSSEC_TIME_FORMAT, CultureInfo.InvariantCulture);
+        }
+
+        public static bool TryParseHex(string val, out byte[] data) {
+            data = [];
+            if (val.Length % 2 != 0) return false;
+            try {
+                data = Convert.FromHexString(val);
+                return true;
+            } catch (FormatException) {
+                return false;
+            }
         }
 
         public static bool TryParseClass(string val, [NotNullWhen(true)] out string? @class) {

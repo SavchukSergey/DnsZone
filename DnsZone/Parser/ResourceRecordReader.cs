@@ -32,7 +32,73 @@ namespace DnsZone.Parser {
             record.KeyTag = context.ReadSerialNumber();
             record.Algorithm = context.ReadU16();
             record.HashType = context.ReadU16();
-            record.Hash = context.ReadSerialNumber();
+            record.Hash = context.ReadEncodedData("digest expected");
+            return record;
+        }
+
+        public ResourceRecord Visit(CdsResourceRecord record, DnsZoneParseContext context) {
+            record.KeyTag = context.ReadSerialNumber();
+            record.Algorithm = context.ReadU16();
+            record.HashType = context.ReadU16();
+            record.Hash = context.ReadEncodedData("digest expected");
+            return record;
+        }
+
+        public ResourceRecord Visit(DnsKeyResourceRecord record, DnsZoneParseContext context) {
+            record.Flags = context.ReadU16();
+            record.Protocol = context.ReadU8();
+            record.Algorithm = context.ReadU8();
+            record.PublicKey = context.ReadEncodedData("public key expected");
+            return record;
+        }
+
+        public ResourceRecord Visit(CDnsKeyResourceRecord record, DnsZoneParseContext context) {
+            record.Flags = context.ReadU16();
+            record.Protocol = context.ReadU8();
+            record.Algorithm = context.ReadU8();
+            record.PublicKey = context.ReadEncodedData("public key expected");
+            return record;
+        }
+
+        public ResourceRecord Visit(RrsigResourceRecord record, DnsZoneParseContext context) {
+            record.TypeCovered = context.ReadTypeMnemonic();
+            record.Algorithm = context.ReadU8();
+            record.Labels = context.ReadU8();
+            record.OriginalTtl = context.ReadTimeSpan();
+            record.SignatureExpiration = context.ReadDnssecTime();
+            record.SignatureInception = context.ReadDnssecTime();
+            record.KeyTag = context.ReadU16();
+            record.SignerName = context.ReadAndResolveDomainName();
+            record.Signature = context.ReadEncodedData("signature expected");
+            return record;
+        }
+
+        public ResourceRecord Visit(NsecResourceRecord record, DnsZoneParseContext context) {
+            record.NextDomainName = context.ReadAndResolveDomainName();
+            record.Types = context.ReadTypeMnemonics();
+            return record;
+        }
+
+        public ResourceRecord Visit(Nsec3ResourceRecord record, DnsZoneParseContext context) {
+            record.HashAlgorithm = context.ReadU8();
+            record.Flags = context.ReadU8();
+            record.Iterations = context.ReadU16();
+            record.Salt = context.ReadSalt();
+            record.NextHashedOwnerName = context.ReadString();
+            record.Types = context.ReadTypeMnemonics();
+            return record;
+        }
+
+        public ResourceRecord Visit(Nsec3ParamResourceRecord record, DnsZoneParseContext context) {
+            record.HashAlgorithm = context.ReadU8();
+            record.Flags = context.ReadU8();
+            record.Iterations = context.ReadU16();
+            record.Salt = context.ReadSalt();
+            return record;
+        }
+
+        public ResourceRecord Visit(UnknownResourceRecord record, DnsZoneParseContext context) {
+            record.Data = context.ReadGenericData();
             return record;
         }
 

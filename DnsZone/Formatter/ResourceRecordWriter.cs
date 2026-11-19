@@ -1,4 +1,5 @@
-﻿using DnsZone.Records;
+﻿using System;
+using DnsZone.Records;
 
 namespace DnsZone.Formatter {
     public class ResourceRecordWriter : IResourceRecordVisitor<DnsZoneFormatterContext, ResourceRecord> {
@@ -33,6 +34,80 @@ namespace DnsZone.Formatter {
             context.WriteU16(record.Algorithm);
             context.WriteU16(record.HashType);
             context.WriteTag(record.Hash);
+            return record;
+        }
+
+        public ResourceRecord Visit(CdsResourceRecord record, DnsZoneFormatterContext context) {
+            context.WriteTag(record.KeyTag);
+            context.WriteU16(record.Algorithm);
+            context.WriteU16(record.HashType);
+            context.WriteTag(record.Hash);
+            return record;
+        }
+
+        public ResourceRecord Visit(DnsKeyResourceRecord record, DnsZoneFormatterContext context) {
+            context.WriteU16(record.Flags);
+            context.WriteU8(record.Protocol);
+            context.WriteU8(record.Algorithm);
+            context.WriteTag(record.PublicKey);
+            return record;
+        }
+
+        public ResourceRecord Visit(CDnsKeyResourceRecord record, DnsZoneFormatterContext context) {
+            context.WriteU16(record.Flags);
+            context.WriteU8(record.Protocol);
+            context.WriteU8(record.Algorithm);
+            context.WriteTag(record.PublicKey);
+            return record;
+        }
+
+        public ResourceRecord Visit(RrsigResourceRecord record, DnsZoneFormatterContext context) {
+            context.WriteTag(record.TypeCovered);
+            context.WriteU8(record.Algorithm);
+            context.WriteU8(record.Labels);
+            context.WriteU32((uint)record.OriginalTtl.TotalSeconds);
+            context.WriteTag(DnsZoneUtils.FormatDnssecTime(record.SignatureExpiration));
+            context.WriteTag(DnsZoneUtils.FormatDnssecTime(record.SignatureInception));
+            context.WriteU16(record.KeyTag);
+            context.WriteAndCompressDomainName(record.SignerName);
+            context.WriteTag(record.Signature);
+            return record;
+        }
+
+        public ResourceRecord Visit(NsecResourceRecord record, DnsZoneFormatterContext context) {
+            context.WriteAndCompressDomainName(record.NextDomainName);
+            foreach (var type in record.Types) {
+                context.WriteTag(type);
+            }
+            return record;
+        }
+
+        public ResourceRecord Visit(Nsec3ResourceRecord record, DnsZoneFormatterContext context) {
+            context.WriteU8(record.HashAlgorithm);
+            context.WriteU8(record.Flags);
+            context.WriteU16(record.Iterations);
+            context.WriteTag(string.IsNullOrEmpty(record.Salt) ? "-" : record.Salt);
+            context.WriteTag(record.NextHashedOwnerName);
+            foreach (var type in record.Types) {
+                context.WriteTag(type);
+            }
+            return record;
+        }
+
+        public ResourceRecord Visit(Nsec3ParamResourceRecord record, DnsZoneFormatterContext context) {
+            context.WriteU8(record.HashAlgorithm);
+            context.WriteU8(record.Flags);
+            context.WriteU16(record.Iterations);
+            context.WriteTag(string.IsNullOrEmpty(record.Salt) ? "-" : record.Salt);
+            return record;
+        }
+
+        public ResourceRecord Visit(UnknownResourceRecord record, DnsZoneFormatterContext context) {
+            context.WriteTag(@"\#");
+            context.WriteU16((ushort)record.Data.Length);
+            if (record.Data.Length > 0) {
+                context.WriteTag(Convert.ToHexString(record.Data));
+            }
             return record;
         }
 

@@ -135,7 +135,21 @@ namespace DnsZone.Formatter {
         }
 
         public void WriteResourceRecordType(ResourceRecordType val) {
-            Sb.Append(DnsZoneUtils.FormatResourceRecordType(val));
+            WriteResourceRecordType(DnsZoneUtils.FormatResourceRecordType(val));
+        }
+
+        public void WriteResourceRecordType(string val) {
+            Sb.Append(val);
+            Sb.Append(TAB_CHAR);
+        }
+
+        public void WriteU8(byte val) {
+            Sb.Append(val);
+            Sb.Append(TAB_CHAR);
+        }
+
+        public void WriteU32(uint val) {
+            Sb.Append(val);
             Sb.Append(TAB_CHAR);
         }
 
