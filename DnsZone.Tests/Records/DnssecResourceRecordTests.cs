@@ -223,5 +223,23 @@ www IN A 192.0.2.1
         public void InvalidSaltTest() {
             Assert.Throws<TokenException>(() => DnsZoneFile.Parse("example.com. 3600 IN NSEC3PARAM 1 0 0 xyz"));
         }
+
+        [Test]
+        public void U8OverflowTest() {
+            var exc = Assert.Throws<TokenException>(() => DnsZoneFile.Parse("example.com. 3600 IN DNSKEY 256 3 256 AwEAAQ=="));
+            Assert.That(exc!.Message, Does.Contain("U8 value expected, but '256' found"));
+        }
+
+        [Test]
+        public void PublicKeyAtEndOfFileTest() {
+            var exc = Assert.Throws<TokenException>(() => DnsZoneFile.Parse("example.com. 3600 IN DNSKEY 256 3 13"));
+            Assert.That(exc!.Message, Does.Contain("public key expected, but end of file reached"));
+        }
+
+        [Test]
+        public void InvalidTypeInBitmapTest() {
+            var exc = Assert.Throws<TokenException>(() => DnsZoneFile.Parse("a.example.com. 3600 IN NSEC b.example.com. A 123"));
+            Assert.That(exc!.Message, Does.Contain("resource record type expected, but '123' found"));
+        }
     }
 }

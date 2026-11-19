@@ -1,4 +1,8 @@
 ﻿using System.Linq;
+using System.Text;
+using DnsZone.Formatter;
+using DnsZone.IO;
+using DnsZone.Parser;
 using DnsZone.Records;
 using DnsZone.Tokens;
 using NUnit.Framework;
@@ -70,6 +74,30 @@ www          IN          A               192.0.2.1";
         [Test]
         public void InvalidHexTest() {
             Assert.Throws<TokenException>(() => DnsZoneFile.Parse(@"a.example.com. 3600 IN TYPE731 \# 2 zzzz"));
+        }
+
+        [Test]
+        public void TypeCodeOutOfRangeTest() {
+            var exc = Assert.Throws<TokenException>(() => DnsZoneFile.Parse(@"a.example.com. 3600 IN TYPE70000 \# 0"));
+            Assert.That(exc!.Message, Does.Contain("unsupported resource record type TYPE70000"));
+        }
+
+        [Test]
+        public void ReadResourceRecordTypeTest() {
+            var tokens = Tokenizer.Read(new FileSource { Content = "rrsig TYPE731" });
+            var context = new DnsZoneParseContext(tokens, new StringDnsSource(""));
+            Assert.That(context.ReadResourceRecordType(), Is.EqualTo(ResourceRecordType.RRSIG));
+            Assert.That(context.ReadResourceRecordType(out var typeCode), Is.EqualTo(ResourceRecordType.Unknown));
+            Assert.That(typeCode, Is.EqualTo(731));
+        }
+
+        [Test]
+        public void WriteResourceRecordTypeTest() {
+            var sb = new StringBuilder();
+            var context = new DnsZoneFormatterContext(new DnsZoneFile(), sb);
+            context.WriteResourceRecordType(ResourceRecordType.NSEC3PARAM);
+            context.WriteResourceRecordType("TYPE731");
+            Assert.That(sb.ToString(), Is.EqualTo("NSEC3PARAM\tTYPE731\t"));
         }
     }
 }
