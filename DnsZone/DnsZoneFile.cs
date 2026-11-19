@@ -227,9 +227,10 @@ namespace DnsZone {
             }
             ResourceRecord record;
             try {
-                record = type == ResourceRecordType.Unknown
-                    ? new UnknownResourceRecord { TypeCode = unknownTypeCode }
-                    : DnsZoneUtils.CreateRecord(type);
+                record = DnsZoneUtils.CreateRecord(type);
+                if (record is UnknownResourceRecord unknown) {
+                    unknown.TypeCode = unknownTypeCode;
+                }
             } catch (NotSupportedException exc) {
                 throw new TokenException(exc.Message, nameToken);
             }

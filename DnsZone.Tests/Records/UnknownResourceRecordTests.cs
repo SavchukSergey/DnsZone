@@ -83,6 +83,19 @@ www          IN          A               192.0.2.1";
         }
 
         [Test]
+        public void TypeZeroTest() {
+            var exc = Assert.Throws<TokenException>(() => DnsZoneFile.Parse(@"a.example.com. 3600 IN TYPE0 \# 0"));
+            Assert.That(exc!.Message, Does.Contain("unsupported resource record type TYPE0"));
+        }
+
+        [Test]
+        public void UnknownTypeUtilsTest() {
+            Assert.That(DnsZoneUtils.CreateRecord(ResourceRecordType.Unknown), Is.TypeOf<UnknownResourceRecord>());
+            Assert.Throws<System.NotSupportedException>(() => DnsZoneUtils.FormatResourceRecordType(ResourceRecordType.Unknown));
+            Assert.That(DnsZoneUtils.FormatResourceRecordType(new UnknownResourceRecord { TypeCode = 731 }), Is.EqualTo("TYPE731"));
+        }
+
+        [Test]
         public void ReadResourceRecordTypeTest() {
             var tokens = Tokenizer.Read(new FileSource { Content = "rrsig TYPE731" });
             var context = new DnsZoneParseContext(tokens, new StringDnsSource(""));

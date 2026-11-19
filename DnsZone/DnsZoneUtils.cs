@@ -46,8 +46,13 @@ namespace DnsZone {
 
         }
 
+        /// <summary>
+        /// Formats record type mnemonic. <see cref="ResourceRecordType.Unknown"/> has no mnemonic of its own:
+        /// use <see cref="FormatResourceRecordType(ResourceRecord)"/> or <see cref="FormatUnknownType"/> to get TYPEnnn.
+        /// </summary>
         public static string FormatResourceRecordType(ResourceRecordType val) {
             return val switch {
+                ResourceRecordType.Unknown => throw new NotSupportedException("unknown record type has no mnemonic, format it from UnknownResourceRecord.TypeCode"),
                 ResourceRecordType.A => "A",
                 ResourceRecordType.AAAA => "AAAA",
                 ResourceRecordType.NS => "NS",
@@ -113,6 +118,7 @@ namespace DnsZone {
                 ResourceRecordType.DS => new DsResourceRecord(),
                 ResourceRecordType.LUA => new LuaResourceRecord(),
                 ResourceRecordType.NAPTR => new NaptrResourceRecord(),
+                ResourceRecordType.Unknown => new UnknownResourceRecord(),
                 ResourceRecordType.DNSKEY => new DnsKeyResourceRecord(),
                 ResourceRecordType.RRSIG => new RrsigResourceRecord(),
                 ResourceRecordType.NSEC => new NsecResourceRecord(),
@@ -141,7 +147,8 @@ namespace DnsZone {
         public static bool TryParseUnknownType(string val, out ushort typeCode) {
             typeCode = 0;
             if (val.Length <= 4 || !val.StartsWith("TYPE", StringComparison.OrdinalIgnoreCase)) return false;
-            return ushort.TryParse(val.AsSpan(4), NumberStyles.None, CultureInfo.InvariantCulture, out typeCode);
+            // type 0 is reserved (RFC 6895 section 3.1)
+            return ushort.TryParse(val.AsSpan(4), NumberStyles.None, CultureInfo.InvariantCulture, out typeCode) && typeCode != 0;
         }
 
         public static string FormatUnknownType(ushort typeCode) {
@@ -179,6 +186,26 @@ namespace DnsZone {
         public static string FormatDnssecTime(DateTime time) {
             if (time.Kind == DateTimeKind.Local) time = time.ToUniversalTime();
             return time.ToString(DNSSEC_TIME_FORMAT, CultureInfo.InvariantCulture);
+        }
+
+        public static bool IsBase64(string val) {
+            if (val.Length == 0 || val.Length % 4 != 0) return false;
+            var buffer = new byte[val.Length / 4 * 3];
+            return Convert.TryFromBase64String(val, buffer, out _);
+        }
+
+        /// <summary>
+        /// Checks whether value is Base32hex without padding (RFC 4648 section 7) as used by NSEC3 (RFC 5155 section 3.3)
+        /// </summary>
+        public static bool IsBase32Hex(string val) {
+            if (val.Length == 0) return false;
+            var rest = val.Length % 8;
+            if (rest == 1 || rest == 3 || rest == 6) return false;
+            foreach (var ch in val) {
+                var upper = char.ToUpperInvariant(ch);
+                if (!char.IsAsciiDigit(upper) && (upper < 'A' || upper > 'V')) return false;
+            }
+            return true;
         }
 
         public static bool TryParseHex(string val, out byte[] data) {

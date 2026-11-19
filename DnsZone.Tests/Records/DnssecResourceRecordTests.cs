@@ -121,7 +121,7 @@ www IN A 192.0.2.1
             var zone = DnsZoneFile.Parse(SIGNED_ZONE);
             var cds = zone.Records.OfType<CdsResourceRecord>().Single();
             Assert.That(cds.Type, Is.EqualTo(ResourceRecordType.CDS));
-            Assert.That(cds.KeyTag, Is.EqualTo("60485"));
+            Assert.That(cds.KeyTag, Is.EqualTo(60485));
             Assert.That(cds.Algorithm, Is.EqualTo(5));
             Assert.That(cds.HashType, Is.EqualTo(1));
             Assert.That(cds.Hash, Is.EqualTo("2BB183AF5F22588179A53B0A98631FAD1A292118"));
@@ -240,6 +240,89 @@ www IN A 192.0.2.1
         public void InvalidTypeInBitmapTest() {
             var exc = Assert.Throws<TokenException>(() => DnsZoneFile.Parse("a.example.com. 3600 IN NSEC b.example.com. A 123"));
             Assert.That(exc!.Message, Does.Contain("resource record type expected, but '123' found"));
+        }
+
+        [TestCase("example.com. 3600 IN DNSKEY 256 3 13 !!not-base64!!")]
+        [TestCase("example.com. 3600 IN DNSKEY 256 3 13 AwEAAQ=A")]
+        [TestCase("example.com. 3600 IN DNSKEY 256 3 13 AwEAAQ== oops")]
+        [TestCase("example.com. 3600 IN CDNSKEY 257 3 13 AwEAAQ== oops")]
+        [TestCase("example.com. 3600 IN RRSIG SOA 13 2 3600 1700000000 1690000000 12345 example.com. c2ln oop")]
+        public void InvalidBase64Test(string zone) {
+            var exc = Assert.Throws<TokenException>(() => DnsZoneFile.Parse(zone));
+            Assert.That(exc!.Message, Does.Contain("invalid Base64"));
+        }
+
+        [TestCase("example.com. 3600 IN DS 60485 5 1 zzzz")]
+        [TestCase("example.com. 3600 IN DS 60485 5 1 ABC")]
+        [TestCase("example.com. 3600 IN CDS 60485 5 1 2BB1 oops")]
+        [TestCase(@"example.com. 3600 IN CDS 0 0 0 \# 0")]
+        public void InvalidDigestTest(string zone) {
+            var exc = Assert.Throws<TokenException>(() => DnsZoneFile.Parse(zone));
+            Assert.That(exc!.Message, Does.Contain("invalid hex"));
+        }
+
+        [TestCase("zzzz!!zzzz")]
+        [TestCase("2t7b4g4vsa5smi47k61mv5bv1a22bojrx")]
+        [TestCase("2t7b4g4vsa5smi47k61mv5bv1a22bojw")]
+        public void InvalidNextHashedOwnerNameTest(string hash) {
+            var exc = Assert.Throws<TokenException>(() => DnsZoneFile.Parse($"example.com. 3600 IN NSEC3 1 0 12 - {hash} A"));
+            Assert.That(exc!.Message, Does.Contain("invalid Base32hex"));
+        }
+
+        [Test]
+        public void UpperCaseNextHashedOwnerNameTest() {
+            var zone = DnsZoneFile.Parse("example.com. 3600 IN NSEC3 1 0 12 - 2T7B4G4VSA5SMI47K61MV5BV1A22BOJR A");
+            Assert.That(zone.Records.OfType<Nsec3ResourceRecord>().Single().NextHashedOwnerName, Is.EqualTo("2T7B4G4VSA5SMI47K61MV5BV1A22BOJR"));
+        }
+
+        [Test]
+        public void DeleteSignalsTest() {
+            // RFC 8078 section 4
+            var zone = DnsZoneFile.Parse("example.com. 3600 IN CDS 0 0 0 00\nexample.com. 3600 IN CDNSKEY 0 3 0 AA==");
+            var cds = zone.Records.OfType<CdsResourceRecord>().Single();
+            Assert.That(cds.KeyTag, Is.EqualTo(0));
+            Assert.That(cds.Hash, Is.EqualTo("00"));
+            var cdnskey = zone.Records.OfType<CDnsKeyResourceRecord>().Single();
+            Assert.That(cdnskey.Flags, Is.EqualTo(0));
+            Assert.That(cdnskey.PublicKey, Is.EqualTo("AA=="));
+            Assert.That(DnsZoneFile.Parse(zone.ToString()).ToString(), Is.EqualTo(zone.ToString()));
+        }
+
+        [TestCase("example.com. 3600 IN CDS 65536 5 1 2BB1")]
+        [TestCase("example.com. 3600 IN CDS 60485 256 1 2BB1")]
+        [TestCase("example.com. 3600 IN CDS 60485 5 256 2BB1")]
+        public void CdsFieldRangeTest(string zone) {
+            Assert.Throws<TokenException>(() => DnsZoneFile.Parse(zone));
+        }
+
+        [Test]
+        public void OutputCdsTest() {
+            var zone = new DnsZoneFile();
+            zone.Records.Add(new CdsResourceRecord {
+                Name = "example.com",
+                Class = "IN",
+                KeyTag = 60485,
+                Algorithm = 5,
+                HashType = 1,
+                Hash = "2BB183AF5F22588179A53B0A98631FAD1A292118"
+            });
+            Assert.That(zone.ToString(), Is.EqualTo(";CDS records\nexample.com.\tIN\t0\tCDS\t60485\t5\t1\t2BB183AF5F22588179A53B0A98631FAD1A292118\t\n\n"));
+        }
+
+        private static readonly ResourceRecord[] EmptyEncodedRecords = [
+            new DnsKeyResourceRecord { Name = "example.com", Class = "IN", Flags = 256, Algorithm = 13 },
+            new CDnsKeyResourceRecord { Name = "example.com", Class = "IN", Flags = 257, Algorithm = 13 },
+            new RrsigResourceRecord { Name = "example.com", Class = "IN", TypeCovered = "A", SignerName = "example.com" },
+            new DsResourceRecord { Name = "example.com", Class = "IN", KeyTag = "1" },
+            new CdsResourceRecord { Name = "example.com", Class = "IN", KeyTag = 1 }
+        ];
+
+        [TestCaseSource(nameof(EmptyEncodedRecords))]
+        public void OutputEmptyEncodedDataTest(ResourceRecord record) {
+            var zone = new DnsZoneFile();
+            zone.Records.Add(record);
+            var exc = Assert.Throws<InvalidOperationException>(() => zone.ToString());
+            Assert.That(exc!.Message, Does.Contain("record 'example.com' is empty"));
         }
     }
 }

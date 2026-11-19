@@ -4,12 +4,15 @@
     /// </summary>
     public class CdsResourceRecord : ResourceRecord {
 
-        public string KeyTag { get; set; } = "";
+        public ushort KeyTag { get; set; }
 
-        public ushort Algorithm { get; set; }
+        public byte Algorithm { get; set; }
 
-        public ushort HashType { get; set; }
+        public byte HashType { get; set; }
 
+        /// <summary>
+        /// Digest in hex encoding
+        /// </summary>
         public string Hash { get; set; } = "";
 
         public override ResourceRecordType Type => ResourceRecordType.CDS;

@@ -33,15 +33,15 @@ namespace DnsZone.Formatter {
             context.WriteTag(record.KeyTag);
             context.WriteU16(record.Algorithm);
             context.WriteU16(record.HashType);
-            context.WriteTag(record.Hash);
+            context.WriteEncodedData(record.Hash, record, nameof(record.Hash));
             return record;
         }
 
         public ResourceRecord Visit(CdsResourceRecord record, DnsZoneFormatterContext context) {
-            context.WriteTag(record.KeyTag);
-            context.WriteU16(record.Algorithm);
-            context.WriteU16(record.HashType);
-            context.WriteTag(record.Hash);
+            context.WriteU16(record.KeyTag);
+            context.WriteU8(record.Algorithm);
+            context.WriteU8(record.HashType);
+            context.WriteEncodedData(record.Hash, record, nameof(record.Hash));
             return record;
         }
 
@@ -49,7 +49,7 @@ namespace DnsZone.Formatter {
             context.WriteU16(record.Flags);
             context.WriteU8(record.Protocol);
             context.WriteU8(record.Algorithm);
-            context.WriteTag(record.PublicKey);
+            context.WriteEncodedData(record.PublicKey, record, nameof(record.PublicKey));
             return record;
         }
 
@@ -57,7 +57,7 @@ namespace DnsZone.Formatter {
             context.WriteU16(record.Flags);
             context.WriteU8(record.Protocol);
             context.WriteU8(record.Algorithm);
-            context.WriteTag(record.PublicKey);
+            context.WriteEncodedData(record.PublicKey, record, nameof(record.PublicKey));
             return record;
         }
 
@@ -70,7 +70,7 @@ namespace DnsZone.Formatter {
             context.WriteTag(DnsZoneUtils.FormatDnssecTime(record.SignatureInception));
             context.WriteU16(record.KeyTag);
             context.WriteAndCompressDomainName(record.SignerName);
-            context.WriteTag(record.Signature);
+            context.WriteEncodedData(record.Signature, record, nameof(record.Signature));
             return record;
         }
 

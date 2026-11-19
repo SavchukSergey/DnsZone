@@ -32,15 +32,15 @@ namespace DnsZone.Parser {
             record.KeyTag = context.ReadSerialNumber();
             record.Algorithm = context.ReadU16();
             record.HashType = context.ReadU16();
-            record.Hash = context.ReadEncodedData("digest expected");
+            record.Hash = context.ReadHex("digest expected");
             return record;
         }
 
         public ResourceRecord Visit(CdsResourceRecord record, DnsZoneParseContext context) {
-            record.KeyTag = context.ReadSerialNumber();
-            record.Algorithm = context.ReadU16();
-            record.HashType = context.ReadU16();
-            record.Hash = context.ReadEncodedData("digest expected");
+            record.KeyTag = context.ReadU16();
+            record.Algorithm = context.ReadU8();
+            record.HashType = context.ReadU8();
+            record.Hash = context.ReadHex("digest expected");
             return record;
         }
 
@@ -48,7 +48,7 @@ namespace DnsZone.Parser {
             record.Flags = context.ReadU16();
             record.Protocol = context.ReadU8();
             record.Algorithm = context.ReadU8();
-            record.PublicKey = context.ReadEncodedData("public key expected");
+            record.PublicKey = context.ReadBase64("public key expected");
             return record;
         }
 
@@ -56,7 +56,7 @@ namespace DnsZone.Parser {
             record.Flags = context.ReadU16();
             record.Protocol = context.ReadU8();
             record.Algorithm = context.ReadU8();
-            record.PublicKey = context.ReadEncodedData("public key expected");
+            record.PublicKey = context.ReadBase64("public key expected");
             return record;
         }
 
@@ -69,7 +69,7 @@ namespace DnsZone.Parser {
             record.SignatureInception = context.ReadDnssecTime();
             record.KeyTag = context.ReadU16();
             record.SignerName = context.ReadAndResolveDomainName();
-            record.Signature = context.ReadEncodedData("signature expected");
+            record.Signature = context.ReadBase64("signature expected");
             return record;
         }
 
@@ -84,7 +84,7 @@ namespace DnsZone.Parser {
             record.Flags = context.ReadU8();
             record.Iterations = context.ReadU16();
             record.Salt = context.ReadSalt();
-            record.NextHashedOwnerName = context.ReadString();
+            record.NextHashedOwnerName = context.ReadBase32Hex("next hashed owner name expected");
             record.Types = context.ReadTypeMnemonics();
             return record;
         }

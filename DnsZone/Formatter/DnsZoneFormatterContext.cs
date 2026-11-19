@@ -143,6 +143,16 @@ namespace DnsZone.Formatter {
             Sb.Append(TAB_CHAR);
         }
 
+        /// <summary>
+        /// Writes Base64 or hex data. Empty data has no presentation form for DNSSEC records, so it is rejected.
+        /// </summary>
+        public void WriteEncodedData(string? val, ResourceRecord record, string fieldName) {
+            if (string.IsNullOrEmpty(val)) {
+                throw new InvalidOperationException($"{fieldName} of {DnsZoneUtils.FormatResourceRecordType(record)} record '{record.Name}' is empty");
+            }
+            WriteTag(val);
+        }
+
         public void WriteU8(byte val) {
             Sb.Append(val);
             Sb.Append(TAB_CHAR);

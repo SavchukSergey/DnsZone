@@ -146,12 +146,47 @@ namespace DnsZone.Parser {
         /// <summary>
         /// Reads Base64 or hex data till the end of the record. Data may be split by whitespace (RFC 4034 section 2.2).
         /// </summary>
-        public string ReadEncodedData(string expected) {
+        private string ReadEncodedData(string expected, out Token firstToken) {
             if (IsEndOfRecord) {
                 if (TryPeek(out var token)) throw new TokenException(expected, token);
                 throw CreateEofException(expected);
             }
-            return string.Concat(ReadRemainingLiterals().Select(item => item.StringValue));
+            var tokens = ReadRemainingLiterals();
+            firstToken = tokens[0];
+            return string.Concat(tokens.Select(item => item.StringValue));
+        }
+
+        /// <summary>
+        /// Reads Base64 data till the end of the record (RFC 4034 section 2.2). Data may be split by whitespace.
+        /// </summary>
+        public string ReadBase64(string expected) {
+            var val = ReadEncodedData(expected, out var token);
+            if (!DnsZoneUtils.IsBase64(val)) {
+                throw new TokenException($"{expected}, but invalid Base64 '{val}' found", token);
+            }
+            return val;
+        }
+
+        /// <summary>
+        /// Reads hex data till the end of the record (RFC 4034 section 5.3). Data may be split by whitespace.
+        /// </summary>
+        public string ReadHex(string expected) {
+            var val = ReadEncodedData(expected, out var token);
+            if (!DnsZoneUtils.TryParseHex(val, out _)) {
+                throw new TokenException($"{expected}, but invalid hex '{val}' found", token);
+            }
+            return val;
+        }
+
+        /// <summary>
+        /// Reads Base32hex value without padding (RFC 4648 section 7, RFC 5155 section 3.3)
+        /// </summary>
+        public string ReadBase32Hex(string expected) {
+            var token = NextLiteral(expected);
+            if (!DnsZoneUtils.IsBase32Hex(token.StringValue)) {
+                throw new TokenException($"{expected}, but invalid Base32hex '{token.StringValue}' found", token);
+            }
+            return token.StringValue;
         }
 
         /// <summary>
